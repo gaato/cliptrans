@@ -1,0 +1,32 @@
+# cliptrans 設定ファイル (TOML)
+# このファイルをプロジェクトルートまたは作業ディレクトリに置いてください。
+# 環境変数 CLIPTRANS_* でも個別に上書き可能です。
+
+# ── データ保存先 ──────────────────────────────────────────────────────────────
+data_dir = "data"                # ジョブデータの保存先
+database_url = "sqlite+aiosqlite:///data/db.sqlite3"
+
+# ── ASR (faster-whisper) ──────────────────────────────────────────────────────
+asr_device = "cuda"              # "cuda" or "cpu"
+asr_compute_type = "int8_float16" # "float16" | "int8_float16" | "int8" (CPU なら "int8")
+asr_model = "large-v3"           # "tiny" | "small" | "medium" | "large-v3"
+
+# ── 翻訳 LLM ──────────────────────────────────────────────────────────────────
+llm_provider = "openai"          # "openai" | "anthropic" | "gemini"
+llm_model = "gpt-5.4-mini"
+
+# ── パイプラインのデフォルト ──────────────────────────────────────────────────
+source_language = "en"
+target_language = "ja"
+
+# ── regroup パラメータ ────────────────────────────────────────────────────────
+regroup_silence_threshold = 1.0  # 無音区間の閾値(秒)
+regroup_max_chars = 200          # 1 utterance の最大文字数
+
+# ── 翻訳バッチ設定 ────────────────────────────────────────────────────────────
+translate_chunk_size = 10        # 一度に翻訳する utterance 数
+translate_context_size = 3       # コンテキストとして渡す直前 utterance 数
+
+# ── 固有名詞辞書 ──────────────────────────────────────────────────────────────
+# ASR 補正・翻訳用語集は glossary.toml で管理しています。
+# 配信ごとの固有名詞 (人名・曲名・衣装名など) はそちらを編集してください。
