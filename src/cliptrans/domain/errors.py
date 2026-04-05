@@ -35,3 +35,15 @@ class JobNotFoundError(CliptransError):
 
 class TimelineError(CliptransError):
     """Raised for timeline read/write/validation errors."""
+
+
+class HolodexError(CliptransError):
+    """Raised when Holodex API request fails."""
+
+
+class SubtitleFetchError(CliptransError):
+    """Raised when subtitle fetching fails."""
+
+
+class ClipFinderError(CliptransError):
+    """Raised when LLM clip finding fails."""

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
@@ -24,7 +24,7 @@ async def repo() -> SQLAlchemyJobRepository:
 
 @pytest.fixture()
 def sample_job() -> Job:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return Job(
         config=JobConfig(source_url="https://example.com/v?id=test"),
         created_at=now,

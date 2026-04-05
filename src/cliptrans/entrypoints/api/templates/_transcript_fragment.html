@@ -1,0 +1,14 @@
+<div class="transcript-list">
+{% if lines %}
+  {% for line in lines %}
+  <div class="transcript-line">
+    <button class="time-btn transcript-ts" onclick="seekTo({{ line.start_sec }})">
+      {{ line.start }}
+    </button>
+    <span class="transcript-text">{{ line.text }}</span>
+  </div>
+  {% endfor %}
+{% else %}
+  <p class="empty-message">字幕データがありません。</p>
+{% endif %}
+</div>

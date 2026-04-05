@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}確定済みクリップ — ClipTrans{% endblock %}
+{% block content %}
+<section class="page-header">
+  <h1>確定済みクリップ</h1>
+</section>
+
+<section class="clip-list">
+  {% if selections %}
+    {% for s in selections %}
+    <div class="clip-card" id="sel-{{ s.id }}">
+      <div class="clip-times">
+        <a href="/stream/{{ s.stream_id }}">{{ s.stream_id }}</a>
+        &nbsp;
+        {{ '%d:%02d'|format(s.start|int // 60, s.start|int % 60) }}
+        →
+        {{ '%d:%02d'|format(s.end|int // 60, s.end|int % 60) }}
+      </div>
+      <p class="clip-title">{{ s.title }}</p>
+      {% if s.notes %}<p class="clip-reason">{{ s.notes }}</p>{% endif %}
+      <div class="clip-meta">
+        <span class="badge badge-status-{{ s.status }}">{{ s.status }}</span>
+      </div>
+      <div class="clip-actions">
+        <button
+          hx-post="/api/clips/selections/{{ s.id }}/reject"
+          hx-target="#sel-{{ s.id }}"
+          hx-swap="outerHTML"
+          class="btn btn-reject"
+        >✘ 却下</button>
+        <button
+          hx-delete="/api/clips/selections/{{ s.id }}"
+          hx-target="#sel-{{ s.id }}"
+          hx-swap="outerHTML"
+          hx-confirm="本当に削除しますか？"
+          class="btn btn-danger"
+        >🗑 削除</button>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p class="empty-message">確定済みクリップがありません。</p>
+  {% endif %}
+</section>
+{% endblock %}

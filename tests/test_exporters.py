@@ -4,16 +4,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
-from cliptrans.application.services.export import ExportService
+from cliptrans.adapters.exporters._utils import format_srt_timestamp, format_vtt_timestamp
 from cliptrans.adapters.exporters.ass import ASSExporter
 from cliptrans.adapters.exporters.srt import SRTExporter
 from cliptrans.adapters.exporters.vtt import VTTExporter
-from cliptrans.adapters.exporters._utils import format_srt_timestamp, format_vtt_timestamp
+from cliptrans.application.services.export import ExportService
 from cliptrans.domain.enums import ExportFormat
 from cliptrans.domain.models import Timeline
-
 
 # ── Timestamp helpers ─────────────────────────────────────────────────────────
 
@@ -80,7 +77,7 @@ class TestSRTExporter:
         path = await SRTExporter().export(timeline, tmp_path)
         # Count index lines (lines that are bare integers)
         lines = path.read_text().splitlines()
-        indices = [l for l in lines if l.strip().isdigit()]
+        indices = [x for x in lines if x.strip().isdigit()]
         assert len(indices) == len(timeline.utterances)
 
 
@@ -111,7 +108,7 @@ class TestVTTExporter:
     async def test_uses_dot_separator(self, tmp_path: Path, timeline: Timeline):
         path = await VTTExporter().export(timeline, tmp_path)
         # VTT uses "." not "," for milliseconds
-        lines = [l for l in path.read_text().splitlines() if "-->" in l]
+        lines = [x for x in path.read_text().splitlines() if "-->" in x]
         for line in lines:
             assert "," not in line
 
@@ -133,11 +130,11 @@ class TestASSExporter:
 
     async def test_dialogue_lines(self, tmp_path: Path, timeline: Timeline):
         path = await ASSExporter().export(timeline, tmp_path)
-        dialogue_lines = [l for l in path.read_text().splitlines() if l.startswith("Dialogue:")]
+        dialogue_lines = [x for x in path.read_text().splitlines() if x.startswith("Dialogue:")]
         assert len(dialogue_lines) == len(timeline.utterances)
 
     async def test_bilingual_doubles_dialogue(self, tmp_path: Path, timeline: Timeline):
         path = await ASSExporter(bilingual=True).export(timeline, tmp_path)
-        dialogue_lines = [l for l in path.read_text().splitlines() if l.startswith("Dialogue:")]
+        dialogue_lines = [x for x in path.read_text().splitlines() if x.startswith("Dialogue:")]
         # Each utterance → 2 lines (original + translation)
         assert len(dialogue_lines) == len(timeline.utterances) * 2

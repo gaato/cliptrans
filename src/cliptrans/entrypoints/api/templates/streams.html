@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Streams — ClipTrans{% endblock %}
+{% block content %}
+<section class="page-header">
+  <h1>配信一覧</h1>
+  <form method="get" action="/" class="filter-form" id="stream-filter">
+
+    <!-- Channel search (autocomplete) -->
+    <div
+      x-data="channelSearch('{{ channel_id }}', '{{ channel_name }}')"
+      class="channel-search-wrap"
+    >
+      <label>
+        チャンネル
+        <div class="channel-input-row">
+          <div class="channel-selected" x-show="selectedId" x-cloak>
+            <img :src="selectedPhoto" class="channel-avatar" x-show="selectedPhoto" />
+            <span x-text="selectedLabel"></span>
+            <button type="button" class="clear-btn" @click="clear()">✕</button>
+          </div>
+          <input
+            type="text"
+            x-show="!selectedId"
+            x-model="query"
+            @input.debounce.300="search()"
+            @keydown.escape="suggestions = []"
+            placeholder="キアラ / Kobo …"
+            autocomplete="off"
+            class="channel-text-input"
+          />
+          <input type="hidden" name="channel_id" x-model="selectedId" />
+          <input type="hidden" name="channel_name" x-model="selectedLabel" />
+        </div>
+        <ul class="channel-suggestions" x-show="suggestions.length" x-cloak>
+          <template x-for="ch in suggestions" :key="ch.id">
+            <li>
+              <button
+                type="button"
+                class="suggestion-item"
+                @click="select(ch)"
+              >
+                <img :src="ch.photo || ''" class="channel-avatar" x-show="ch.photo" />
+                <span class="ch-name" x-text="ch.english_name || ch.name"></span>
+                <span class="ch-org" x-text="ch.org || ''"></span>
+              </button>
+            </li>
+          </template>
+        </ul>
+      </label>
+    </div>
+
+    <!-- Org filter -->
+    <label>
+      Org
+      <input type="text" name="org" value="{{ org }}" placeholder="Hololive …" />
+    </label>
+
+    <!-- Status filter -->
+    <label>
+      Status
+      <select name="status">
+        <option value="past" {% if status == 'past' %}selected{% endif %}>Past</option>
+        <option value="live" {% if status == 'live' %}selected{% endif %}>Live</option>
+      </select>
+    </label>
+
+    <button type="submit" class="filter-submit">検索</button>
+  </form>
+</section>
+
+<section class="stream-grid">
+  {% if streams %}
+    {% for s in streams %}
+    <a href="/stream/{{ s.video_id }}" class="stream-card">
+      <div class="stream-thumb">
+        <img
+          src="https://img.youtube.com/vi/{{ s.video_id }}/mqdefault.jpg"
+          alt="{{ s.title }}"
+          loading="lazy"
+        />
+        {% if s.status == "live" %}<span class="badge badge-live">LIVE</span>{% endif %}
+      </div>
+      <div class="stream-info">
+        <div class="stream-channel">
+          {% if s.channel_photo %}
+          <img src="{{ s.channel_photo }}" class="channel-avatar-sm" alt="" />
+          {% endif %}
+          <span>{{ s.channel_english_name or s.channel_name }}</span>
+          {% if s.org %}<span class="stream-org">{{ s.org }}</span>{% endif %}
+        </div>
+        <p class="stream-title">{{ s.title }}</p>
+        {% if s.duration %}
+        <p class="stream-duration">{{ (s.duration // 3600) }}h {{ ((s.duration % 3600) // 60) }}m</p>
+        {% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  {% else %}
+    <p class="empty-message">
+      配信が見つかりませんでした。<br/>
+      {% if not channel_id %}CLIPTRANS_HOLODEX_API_KEY が設定されているか確認してください。{% endif %}
+    </p>
+  {% endif %}
+</section>
+
+<script>
+function channelSearch(initId, initLabel) {
+  return {
+    query: '',
+    selectedId: initId || '',
+    selectedLabel: initLabel || '',
+    selectedPhoto: '',
+    suggestions: [],
+    async search() {
+      if (this.query.length < 1) { this.suggestions = []; return; }
+      const resp = await fetch('/api/streams/channels/suggest?q=' + encodeURIComponent(this.query));
+      if (resp.ok) this.suggestions = await resp.json();
+    },
+    select(ch) {
+      this.selectedId = ch.id;
+      this.selectedLabel = ch.english_name || ch.name;
+      this.selectedPhoto = ch.photo || '';
+      this.query = '';
+      this.suggestions = [];
+      // Build URL directly to avoid Alpine reactivity timing issue
+      const form = document.getElementById('stream-filter');
+      const org = form.querySelector('[name=org]')?.value || '';
+      const status = form.querySelector('[name=status]')?.value || 'past';
+      const params = new URLSearchParams({
+        channel_id: ch.id,
+        channel_name: ch.english_name || ch.name,
+        status,
+        org,
+      });
+      window.location.href = '/?' + params.toString();
+    },
+    clear() {
+      this.selectedId = '';
+      this.selectedLabel = '';
+      this.selectedPhoto = '';
+    },
+  };
+}
+</script>
+{% endblock %}

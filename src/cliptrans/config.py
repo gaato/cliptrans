@@ -82,6 +82,21 @@ class AppConfig(BaseSettings):
         description="SQLAlchemy async database URL",
     )
 
+    # Holodex
+    holodex_api_key: str | None = Field(default=None, description="Holodex API key")
+    holodex_default_org: str | None = Field(default=None, description="Default org filter")
+
+    # Clip Finder
+    clip_finder_chunk_minutes: float = Field(
+        default=10.0, description="Subtitle chunk window (minutes)"
+    )
+    clip_finder_overlap_minutes: float = Field(default=1.0, description="Chunk overlap (minutes)")
+    clip_finder_max_candidates: int = Field(default=20, description="Max candidates per stream")
+
+    # Web UI
+    web_host: str = Field(default="127.0.0.1", description="Web server host")
+    web_port: int = Field(default=8000, description="Web server port")
+
 
 _config: AppConfig | None = None
 

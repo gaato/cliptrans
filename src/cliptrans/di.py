@@ -66,3 +66,39 @@ def make_pipeline(config: AppConfig | None = None):
         job_repo=make_job_repository(cfg),
         config=cfg,
     )
+
+
+def make_holodex(config: AppConfig | None = None):
+    cfg = config or get_config()
+    if cfg.holodex_api_key:
+        from cliptrans.adapters.holodex import HolodexAdapter
+
+        return HolodexAdapter(cfg.holodex_api_key)
+    from cliptrans.adapters.holodex import _StubHolodex
+
+    return _StubHolodex()
+
+
+def make_clip_finder_service(config: AppConfig | None = None):
+    cfg = config or get_config()
+    from cliptrans.adapters.llm.clip_finder_agent import ClipFinderAgent
+    from cliptrans.adapters.subtitle_fetcher import YtdlpSubtitleFetcher
+    from cliptrans.application.services.clip_finder import ClipFinderService
+
+    agent = ClipFinderAgent(
+        provider=cfg.llm_provider, model=cfg.llm_model, api_key=cfg.openai_api_key
+    )
+    return ClipFinderService(
+        subtitle_fetcher=YtdlpSubtitleFetcher(),
+        agent=agent,
+        chunk_minutes=cfg.clip_finder_chunk_minutes,
+        overlap_minutes=cfg.clip_finder_overlap_minutes,
+        max_candidates=cfg.clip_finder_max_candidates,
+    )
+
+
+def make_clip_repository(config: AppConfig | None = None):
+    cfg = config or get_config()
+    from cliptrans.adapters.persistence.clip_repository import SQLAlchemyClipRepository
+
+    return SQLAlchemyClipRepository(cfg.database_url)

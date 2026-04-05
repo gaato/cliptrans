@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
@@ -22,7 +22,7 @@ from cliptrans.domain.models import (
 
 @pytest.fixture()
 def now() -> datetime:
-    return datetime(2026, 4, 5, 12, 0, 0, tzinfo=timezone.utc)
+    return datetime(2026, 4, 5, 12, 0, 0, tzinfo=UTC)
 
 
 @pytest.fixture()
@@ -75,7 +75,12 @@ def utterances(segments: list[Segment]) -> list[Utterance]:
 
 
 @pytest.fixture()
-def timeline(source_meta: SourceMeta, segments: list[Segment], utterances: list[Utterance], now: datetime) -> Timeline:
+def timeline(
+    source_meta: SourceMeta,
+    segments: list[Segment],
+    utterances: list[Utterance],
+    now: datetime,
+) -> Timeline:
     return Timeline(
         job_id=uuid4(),
         source=source_meta,

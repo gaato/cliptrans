@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from datetime import UTC
 from uuid import UUID
 
 import pytest
+from pydantic import ValidationError
 
-from cliptrans.domain.enums import ASREngine, ExportFormat, JobStatus, StageKind
+from cliptrans.domain.enums import ASREngine, ExportFormat, JobStatus
 from cliptrans.domain.models import (
     Job,
     JobConfig,
@@ -60,14 +62,14 @@ class TestJobConfig:
         assert ExportFormat.SRT in cfg.export_formats
 
     def test_validation_error_without_url(self):
-        with pytest.raises(Exception):
-            JobConfig()  # type: ignore[call-arg]
+        with pytest.raises(ValidationError):
+            JobConfig()  # type: ignore[call-arg]  # ty: ignore[missing-argument]
 
 
 class TestJob:
     def test_defaults(self, job_config):
-        from datetime import datetime, timezone
-        now = datetime.now(timezone.utc)
+        from datetime import datetime
+        now = datetime.now(UTC)
         job = Job(config=job_config, created_at=now, updated_at=now)
         assert job.status == JobStatus.PENDING
         assert job.completed_stages == []
