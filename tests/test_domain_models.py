@@ -69,6 +69,7 @@ class TestJobConfig:
 class TestJob:
     def test_defaults(self, job_config):
         from datetime import datetime
+
         now = datetime.now(UTC)
         job = Job(config=job_config, created_at=now, updated_at=now)
         assert job.status == JobStatus.PENDING

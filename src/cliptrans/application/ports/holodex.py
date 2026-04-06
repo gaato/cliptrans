@@ -8,9 +8,7 @@ from cliptrans.domain.models import ChannelInfo, StreamInfo
 
 
 class HolodexPort(Protocol):
-    async def search_channels(
-        self, query: str, *, limit: int = 10
-    ) -> list[ChannelInfo]: ...
+    async def search_channels(self, query: str, *, limit: int = 10) -> list[ChannelInfo]: ...
 
     async def list_live_streams(
         self, *, org: str | None = None, limit: int = 50

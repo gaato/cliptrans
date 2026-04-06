@@ -16,11 +16,15 @@ class YtdlpSubtitleFetcher:
         """Fetch SRT subtitles. Auto-detects the best available caption language
         from the video's metadata (prefers native language, then English)."""
         import json as _json
+
         url = f"https://www.youtube.com/watch?v={video_id}"
 
         # Get metadata to find the best available caption language
         proc = await asyncio.create_subprocess_exec(
-            "yt-dlp", "--dump-json", "--skip-download", url,
+            "yt-dlp",
+            "--dump-json",
+            "--skip-download",
+            url,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
@@ -50,9 +54,12 @@ class YtdlpSubtitleFetcher:
                 "yt-dlp",
                 "--skip-download",
                 "--write-auto-sub",
-                "--sub-lang", lang,
-                "--sub-format", "srt",
-                "--output", f"{tmpdir}/%(id)s.%(ext)s",
+                "--sub-lang",
+                lang,
+                "--sub-format",
+                "srt",
+                "--output",
+                f"{tmpdir}/%(id)s.%(ext)s",
                 url,
             ]
             proc = await asyncio.create_subprocess_exec(
@@ -67,7 +74,5 @@ class YtdlpSubtitleFetcher:
                 return srt_files[0].read_text(encoding="utf-8")
 
             if proc.returncode != 0:
-                raise SubtitleFetchError(
-                    f"yt-dlp failed for {video_id}: {stderr.decode()[:500]}"
-                )
+                raise SubtitleFetchError(f"yt-dlp failed for {video_id}: {stderr.decode()[:500]}")
             return ""

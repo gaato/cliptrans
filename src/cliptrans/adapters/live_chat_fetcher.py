@@ -22,9 +22,12 @@ class YtdlpLiveChatFetcher:
                 "yt-dlp",
                 "--skip-download",
                 "--write-sub",
-                "--sub-lang", "live_chat",
-                "--sub-format", "json",
-                "--output", f"{tmpdir}/%(id)s.%(ext)s",
+                "--sub-lang",
+                "live_chat",
+                "--sub-format",
+                "json",
+                "--output",
+                f"{tmpdir}/%(id)s.%(ext)s",
                 url,
             ]
             proc = await asyncio.create_subprocess_exec(
@@ -59,15 +62,13 @@ def _parse_live_chat(path: Path) -> list[dict]:
             offset_sec = int(offset_ms) / 1000.0
             for action in replay.get("actions", []):
                 item = action.get("addChatItemAction", {}).get("item", {})
-                renderer = (
-                    item.get("liveChatTextMessageRenderer")
-                    or item.get("liveChatPaidMessageRenderer")
+                renderer = item.get("liveChatTextMessageRenderer") or item.get(
+                    "liveChatPaidMessageRenderer"
                 )
                 if renderer is None:
                     continue
                 text = "".join(
-                    run.get("text", "")
-                    for run in renderer.get("message", {}).get("runs", [])
+                    run.get("text", "") for run in renderer.get("message", {}).get("runs", [])
                 )
                 events.append({"offset_sec": offset_sec, "message": text})
     return events

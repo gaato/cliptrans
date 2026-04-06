@@ -21,12 +21,17 @@ class FfmpegMediaProcessor:
         """Extract mono WAV at *sample_rate* Hz from *video* into *output*."""
         output.parent.mkdir(parents=True, exist_ok=True)
         cmd = [
-            "ffmpeg", "-y",
-            "-i", str(video),
+            "ffmpeg",
+            "-y",
+            "-i",
+            str(video),
             "-vn",
-            "-acodec", "pcm_s16le",
-            "-ar", str(sample_rate),
-            "-ac", "1",
+            "-acodec",
+            "pcm_s16le",
+            "-ar",
+            str(sample_rate),
+            "-ac",
+            "1",
             str(output),
         ]
         await _run(cmd, error_cls=PrepareError, context="audio extraction")
@@ -35,9 +40,13 @@ class FfmpegMediaProcessor:
     async def probe(self, file: Path) -> MediaInfo:
         """Return basic media info for *file* using ffprobe."""
         cmd = [
-            "ffprobe", "-v", "quiet",
-            "-print_format", "json",
-            "-show_streams", "-show_format",
+            "ffprobe",
+            "-v",
+            "quiet",
+            "-print_format",
+            "json",
+            "-show_streams",
+            "-show_format",
             str(file),
         ]
         proc = await asyncio.create_subprocess_exec(
@@ -47,9 +56,7 @@ class FfmpegMediaProcessor:
         )
         stdout, stderr = await proc.communicate()
         if proc.returncode != 0:
-            raise PrepareError(
-                f"ffprobe failed on {file}: {stderr.decode(errors='replace')}"
-            )
+            raise PrepareError(f"ffprobe failed on {file}: {stderr.decode(errors='replace')}")
         data = json.loads(stdout.decode())
         return _parse_mediainfo(data)
 
@@ -57,14 +64,22 @@ class FfmpegMediaProcessor:
         """Generate a low-res proxy for editing previews."""
         output.parent.mkdir(parents=True, exist_ok=True)
         cmd = [
-            "ffmpeg", "-y",
-            "-i", str(video),
-            "-vf", "scale=iw/4:ih/4",
-            "-c:v", "libx264",
-            "-preset", "ultrafast",
-            "-crf", "28",
-            "-c:a", "aac",
-            "-b:a", "64k",
+            "ffmpeg",
+            "-y",
+            "-i",
+            str(video),
+            "-vf",
+            "scale=iw/4:ih/4",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "ultrafast",
+            "-crf",
+            "28",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "64k",
             str(output),
         ]
         await _run(cmd, error_cls=PrepareError, context="proxy generation")
@@ -80,8 +95,7 @@ async def _run(cmd: list[str], *, error_cls: type[Exception], context: str) -> N
     _, stderr = await proc.communicate()
     if proc.returncode != 0:
         raise error_cls(
-            f"ffmpeg {context} failed (exit {proc.returncode}): "
-            f"{stderr.decode(errors='replace')}"
+            f"ffmpeg {context} failed (exit {proc.returncode}): {stderr.decode(errors='replace')}"
         )
 
 

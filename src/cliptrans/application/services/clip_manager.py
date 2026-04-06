@@ -14,9 +14,7 @@ class ClipManagerService:
     def __init__(self, clip_repo: ClipRepositoryPort) -> None:
         self._repo = clip_repo
 
-    async def approve_candidate(
-        self, candidate: ClipCandidate, notes: str = ""
-    ) -> ClipSelection:
+    async def approve_candidate(self, candidate: ClipCandidate, notes: str = "") -> ClipSelection:
         now = datetime.now(UTC)
         selection = ClipSelection(
             stream_id=candidate.stream_id,

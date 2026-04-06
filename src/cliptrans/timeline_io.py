@@ -21,8 +21,7 @@ def read_timeline(path: Path) -> Timeline:
     version = raw.get("version", "unknown")
     if version not in SUPPORTED_VERSIONS:
         raise TimelineError(
-            f"Unsupported timeline version {version!r}. "
-            f"Supported: {sorted(SUPPORTED_VERSIONS)}"
+            f"Unsupported timeline version {version!r}. Supported: {sorted(SUPPORTED_VERSIONS)}"
         )
 
     try:

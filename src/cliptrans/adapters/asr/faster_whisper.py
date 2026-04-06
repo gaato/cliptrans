@@ -70,8 +70,7 @@ class FasterWhisperTranscriber:
             from faster_whisper import WhisperModel
         except ImportError as exc:
             raise TranscribeError(
-                "faster-whisper is not installed. "
-                "Run: uv pip install faster-whisper"
+                "faster-whisper is not installed. Run: uv pip install faster-whisper"
             ) from exc
 
         # Try loading from cache first (avoids HTTPS calls to HuggingFace).

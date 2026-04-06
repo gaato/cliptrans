@@ -49,14 +49,17 @@ class PydanticAITranslator:
         if provider == "openai":
             from pydantic_ai.models.openai import OpenAIChatModel
             from pydantic_ai.providers.openai import OpenAIProvider
+
             return OpenAIChatModel(self._model, provider=OpenAIProvider(api_key=api_key))
         if provider == "anthropic":
             from pydantic_ai.models.anthropic import AnthropicModel
             from pydantic_ai.providers.anthropic import AnthropicProvider
+
             return AnthropicModel(self._model, provider=AnthropicProvider(api_key=api_key))
         if provider in ("gemini", "google-gla", "google"):
             from pydantic_ai.models.google import GoogleModel
             from pydantic_ai.providers.google import GoogleProvider
+
             return GoogleModel(self._model, provider=GoogleProvider(api_key=api_key))
         raise ValueError(f"Unsupported LLM provider: {self._provider!r}")
 
@@ -80,8 +83,7 @@ class PydanticAITranslator:
         context_text = ""
         if context:
             recent = "\n".join(
-                f"  [{u.original}] → [{u.translation or '(untranslated)'}]"
-                for u in context[-5:]
+                f"  [{u.original}] → [{u.translation or '(untranslated)'}]" for u in context[-5:]
             )
             context_text = f"\nPrevious utterances for context:\n{recent}"
 
@@ -95,9 +97,7 @@ class PydanticAITranslator:
             f"{context_text}"
         )
 
-        user_lines = "\n".join(
-            f'id={u.id} text="{u.original}"' for u in utterances
-        )
+        user_lines = "\n".join(f'id={u.id} text="{u.original}"' for u in utterances)
 
         model_obj = self._build_model()
         agent = Agent(model_obj, output_type=_TranslationResult, system_prompt=system_prompt)
@@ -108,8 +108,7 @@ class PydanticAITranslator:
             raise TranslateError(f"LLM translation failed: {exc}") from exc
 
         translation_map = {
-            item.id: item.translation
-            for item in cast(_TranslationResult, result.output).items
+            item.id: item.translation for item in cast(_TranslationResult, result.output).items
         }
 
         updated: list[Utterance] = []

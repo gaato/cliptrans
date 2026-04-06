@@ -71,7 +71,7 @@ class TestRegroupBasic:
     def test_max_chars_hard_split(self):
         svc = RegroupService(silence_threshold=10.0, max_chars=10)
         segs = [
-            seg(0.0, 1.0, "AAAAA"),   # 5 chars
+            seg(0.0, 1.0, "AAAAA"),  # 5 chars
             seg(1.1, 2.0, "BBBBBB"),  # 6 chars → would exceed 10
         ]
         utts = svc._regroup(segs)

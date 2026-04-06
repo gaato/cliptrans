@@ -58,9 +58,7 @@ class ExportService:
     ) -> Path:
         match fmt:
             case ExportFormat.SRT:
-                return await SRTExporter(bilingual=self._bilingual).export(
-                    timeline, output_dir
-                )
+                return await SRTExporter(bilingual=self._bilingual).export(timeline, output_dir)
             case ExportFormat.SRT_BILINGUAL:
                 return await SRTExporter(bilingual=True).export(
                     timeline, output_dir, filename="subtitles.bilingual.srt"
@@ -70,17 +68,13 @@ class ExportService:
                     timeline, output_dir, filename="subtitles.kdenlive.srt"
                 )
             case ExportFormat.VTT:
-                return await VTTExporter(bilingual=self._bilingual).export(
-                    timeline, output_dir
-                )
+                return await VTTExporter(bilingual=self._bilingual).export(timeline, output_dir)
             case ExportFormat.VTT_BILINGUAL:
                 return await VTTExporter(bilingual=True).export(
                     timeline, output_dir, filename="subtitles.bilingual.vtt"
                 )
             case ExportFormat.ASS:
-                return await ASSExporter(bilingual=self._bilingual).export(
-                    timeline, output_dir
-                )
+                return await ASSExporter(bilingual=self._bilingual).export(timeline, output_dir)
             case ExportFormat.ASS_BILINGUAL:
                 return await ASSExporter(bilingual=True).export(
                     timeline, output_dir, filename="subtitles.bilingual.ass"

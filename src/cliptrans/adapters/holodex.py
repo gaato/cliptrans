@@ -45,24 +45,18 @@ class HolodexAdapter:
             topic_id=data.get("topic_id"),
         )
 
-    async def search_channels(
-        self, query: str, *, limit: int = 10
-    ) -> list[ChannelInfo]:
+    async def search_channels(self, query: str, *, limit: int = 10) -> list[ChannelInfo]:
         """Search channels via autoComplete, then fetch their details."""
         try:
             async with self._client() as client:
-                ac_resp = await client.get(
-                    "/search/autoComplete", params={"q": query}
-                )
+                ac_resp = await client.get("/search/autoComplete", params={"q": query})
                 ac_resp.raise_for_status()
         except httpx.HTTPError as exc:
             raise HolodexError(f"Holodex autoComplete failed: {exc}") from exc
 
-        channel_ids = [
-            item["value"]
-            for item in ac_resp.json()
-            if item.get("type") == "channel"
-        ][:limit]
+        channel_ids = [item["value"] for item in ac_resp.json() if item.get("type") == "channel"][
+            :limit
+        ]
         if not channel_ids:
             return []
 
@@ -128,6 +122,7 @@ class HolodexAdapter:
         except httpx.HTTPError as exc:
             raise HolodexError(f"Holodex /videos/{video_id} failed: {exc}") from exc
         return self._parse_stream(resp.json())
+
 
 class _StubHolodex:
     """No-op Holodex adapter used when no API key is configured."""

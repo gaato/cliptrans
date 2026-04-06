@@ -59,9 +59,7 @@ class ASSExporter:
             text = utt.translation or utt.original
 
             if self._bilingual and utt.translation:
-                orig_line = (
-                    f"Dialogue: 0,{start},{end},Original,,0,0,0,,{utt.original}"
-                )
+                orig_line = f"Dialogue: 0,{start},{end},Original,,0,0,0,,{utt.original}"
                 lines.append(orig_line)
 
             lines.append(f"Dialogue: 0,{start},{end},Default,,0,0,0,,{text}")

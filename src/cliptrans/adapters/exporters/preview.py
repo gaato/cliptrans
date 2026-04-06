@@ -23,13 +23,20 @@ class PreviewExporter:
         preview_path = output_dir / "preview.mp4"
 
         cmd = [
-            "ffmpeg", "-y",
-            "-i", str(video_path),
-            "-vf", f"ass={ass_path}",
-            "-c:v", "libx264",
-            "-preset", "fast",
-            "-crf", "23",
-            "-c:a", "aac",
+            "ffmpeg",
+            "-y",
+            "-i",
+            str(video_path),
+            "-vf",
+            f"ass={ass_path}",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "fast",
+            "-crf",
+            "23",
+            "-c:a",
+            "aac",
             str(preview_path),
         ]
 
@@ -41,7 +48,6 @@ class PreviewExporter:
         _, stderr = await proc.communicate()
         if proc.returncode != 0:
             raise ExportError(
-                f"ffmpeg preview failed (exit {proc.returncode}): "
-                f"{stderr.decode(errors='replace')}"
+                f"ffmpeg preview failed (exit {proc.returncode}): {stderr.decode(errors='replace')}"
             )
         return preview_path

@@ -41,17 +41,29 @@ def source_meta() -> SourceMeta:
 def segments() -> list[Segment]:
     return [
         Segment(
-            start=0.0, end=2.0, text="こんにちは、", language="ja",
+            start=0.0,
+            end=2.0,
+            text="こんにちは、",
+            language="ja",
             words=[Word(start=0.0, end=2.0, word="こんにちは、", confidence=0.95)],
         ),
         Segment(
-            start=2.1, end=4.5, text="みなさん。", language="ja",
+            start=2.1,
+            end=4.5,
+            text="みなさん。",
+            language="ja",
         ),
         Segment(
-            start=6.0, end=9.0, text="今日もよろしくお願いします。", language="ja",
+            start=6.0,
+            end=9.0,
+            text="今日もよろしくお願いします。",
+            language="ja",
         ),
         Segment(
-            start=9.1, end=11.0, text="早速始めましょう！", language="ja",
+            start=9.1,
+            end=11.0,
+            text="早速始めましょう！",
+            language="ja",
         ),
     ]
 
@@ -61,13 +73,15 @@ def utterances(segments: list[Segment]) -> list[Utterance]:
     return [
         Utterance(
             segment_ids=[segments[0].id, segments[1].id],
-            start=0.0, end=4.5,
+            start=0.0,
+            end=4.5,
             original="こんにちは、みなさん。",
             translation="Hello, everyone.",
         ),
         Utterance(
             segment_ids=[segments[2].id, segments[3].id],
-            start=6.0, end=11.0,
+            start=6.0,
+            end=11.0,
             original="今日もよろしくお願いします。早速始めましょう！",
             translation="Thanks for joining today. Let's get started!",
         ),

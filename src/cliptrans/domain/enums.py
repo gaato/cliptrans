@@ -35,8 +35,8 @@ class ExportFormat(StrEnum):
 
 
 class ClipStatus(StrEnum):
-    PENDING = "pending"       # 候補として表示中
-    QUEUED = "queued"         # 制作キュー投入済み
-    PROCESSING = "processing" # パイプライン実行中
-    DONE = "done"             # 完了
-    REJECTED = "rejected"     # 人間が却下
+    PENDING = "pending"  # 候補として表示中
+    QUEUED = "queued"  # 制作キュー投入済み
+    PROCESSING = "processing"  # パイプライン実行中
+    DONE = "done"  # 完了
+    REJECTED = "rejected"  # 人間が却下
