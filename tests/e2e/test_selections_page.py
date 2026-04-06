@@ -6,8 +6,7 @@ Covers
 * Selection cards rendered from DB
 * Each card shows stream link, timestamps, title, status badge
 * 「✘ 却下」(Reject) sends HTMX POST and the card is replaced
-* 「🗑 削除」(Delete) prompts for confirmation, then sends HTMX DELETE and
-  removes the card from the page
+* 「🗑 削除」(Delete) prompts for confirmation, then sends HTMX DELETE
 """
 
 from __future__ import annotations
