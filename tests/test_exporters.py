@@ -14,6 +14,7 @@ from cliptrans.domain.models import Timeline
 
 # ── Timestamp helpers ─────────────────────────────────────────────────────────
 
+
 class TestTimestampFormatters:
     def test_srt_zero(self):
         assert format_srt_timestamp(0.0) == "00:00:00,000"
@@ -37,6 +38,7 @@ class TestTimestampFormatters:
 
 
 # ── SRT ───────────────────────────────────────────────────────────────────────
+
 
 class TestSRTExporter:
     async def test_creates_file(self, tmp_path: Path, timeline: Timeline):
@@ -96,6 +98,7 @@ class TestExportService:
 
 # ── VTT ───────────────────────────────────────────────────────────────────────
 
+
 class TestVTTExporter:
     async def test_starts_with_webvtt(self, tmp_path: Path, timeline: Timeline):
         path = await VTTExporter().export(timeline, tmp_path)
@@ -114,6 +117,7 @@ class TestVTTExporter:
 
 
 # ── ASS ───────────────────────────────────────────────────────────────────────
+
 
 class TestASSExporter:
     async def test_creates_ass_file(self, tmp_path: Path, timeline: Timeline):

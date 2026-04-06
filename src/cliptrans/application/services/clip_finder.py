@@ -49,6 +49,7 @@ def _chunk_srt(
             renumbered = []
             for idx, (_ts, b) in enumerate(window_blocks, 1):
                 b = re.sub(r"^\d+", str(idx), b, count=1)
+
                 # Rewrite timestamps: HH:MM:SS,mmm --> HH:MM:SS,mmm (relative)
                 def _shift_ts(m_ts: re.Match, *, _chunk_start: float = chunk_start) -> str:
                     t1 = ts_to_sec(m_ts.group(1)) - _chunk_start
@@ -66,9 +67,7 @@ def _chunk_srt(
     return chunks
 
 
-def _chat_intensity_for(
-    chat_density: list[ChatDensity], start: float, end: float
-) -> float | None:
+def _chat_intensity_for(chat_density: list[ChatDensity], start: float, end: float) -> float | None:
     """Average chat intensity over [start, end] seconds."""
     if not chat_density:
         return None
@@ -95,23 +94,17 @@ class ClipFinderService:
         self._overlap_seconds = overlap_minutes * 60
         self._max_candidates = max_candidates
 
-    async def find_candidates(
-        self, video_id: str
-    ) -> list[ClipCandidate]:
+    async def find_candidates(self, video_id: str) -> list[ClipCandidate]:
         import asyncio
 
         from cliptrans.application.services.chat_analyzer import ChatAnalyzerService
 
         # Fetch subtitles and live chat concurrently
-        subtitle_task = asyncio.create_task(
-            self._fetcher.fetch_srt(video_id)
-        )
+        subtitle_task = asyncio.create_task(self._fetcher.fetch_srt(video_id))
 
         live_chat_task: asyncio.Task | None = None
         if self._live_chat_fetcher is not None:
-            live_chat_task = asyncio.create_task(
-                self._live_chat_fetcher.fetch_events(video_id)
-            )
+            live_chat_task = asyncio.create_task(self._live_chat_fetcher.fetch_events(video_id))
 
         srt_text = await subtitle_task
 
@@ -122,9 +115,7 @@ class ClipFinderService:
                 # Estimate duration from last subtitle timestamp
                 chunks_tmp = _chunk_srt(srt_text, self._chunk_seconds, self._overlap_seconds)
                 stream_duration = (
-                    int(chunks_tmp[-1][0] + self._chunk_seconds)
-                    if chunks_tmp
-                    else 3600
+                    int(chunks_tmp[-1][0] + self._chunk_seconds) if chunks_tmp else 3600
                 )
                 analyzer = ChatAnalyzerService()
                 chat_density = analyzer.compute_from_live_chat(
@@ -170,9 +161,7 @@ class ClipFinderService:
         try:
             yield {"type": "progress", "step": 0, "total": 1, "message": "字幕とチャットを取得中…"}
 
-            subtitle_task = asyncio.create_task(
-                self._fetcher.fetch_srt(video_id)
-            )
+            subtitle_task = asyncio.create_task(self._fetcher.fetch_srt(video_id))
             live_chat_task = (
                 asyncio.create_task(self._live_chat_fetcher.fetch_events(video_id))
                 if self._live_chat_fetcher is not None
@@ -187,9 +176,7 @@ class ClipFinderService:
                 if live_chat_events:
                     chunks_tmp = _chunk_srt(srt_text, self._chunk_seconds, self._overlap_seconds)
                     stream_duration = (
-                        int(chunks_tmp[-1][0] + self._chunk_seconds)
-                        if chunks_tmp
-                        else 3600
+                        int(chunks_tmp[-1][0] + self._chunk_seconds) if chunks_tmp else 3600
                     )
                     analyzer = ChatAnalyzerService()
                     chat_density = analyzer.compute_from_live_chat(
@@ -206,8 +193,12 @@ class ClipFinderService:
 
             for i, (offset, chunk) in enumerate(chunks, 1):
                 start_min = int(offset // 60)
-                yield {"type": "progress", "step": i, "total": total,
-                       "message": f"チャンク {i}/{total} を解析中… ({start_min}分〜)"}
+                yield {
+                    "type": "progress",
+                    "step": i,
+                    "total": total,
+                    "message": f"チャンク {i}/{total} を解析中… ({start_min}分〜)",
+                }
                 candidates = await self._agent.find_candidates(video_id, chunk, chunk_offset=offset)
                 all_candidates.extend(candidates)
 

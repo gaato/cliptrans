@@ -13,7 +13,7 @@ Covers
 from __future__ import annotations
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Dialog, Page, Request, Response, expect
 
 from e2e.fixtures import TEST_VIDEO_ID
 
@@ -73,9 +73,7 @@ def test_selection_card_notes(page: Page, live_server_url: str, seeded_clips: di
     expect(page.locator(".clip-reason")).to_contain_text("Must include this")
 
 
-def test_selection_card_status_badge(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_selection_card_status_badge(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """Selection card shows a status badge ('pending')."""
     _goto_selections(page, live_server_url)
     badge = page.locator(".badge-status-pending")
@@ -83,9 +81,7 @@ def test_selection_card_status_badge(
     expect(badge).to_contain_text("pending")
 
 
-def test_selection_card_timestamps(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_selection_card_timestamps(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """Selection card shows start → end timestamps (2:30 → 4:30)."""
     _goto_selections(page, live_server_url)
     clip_times = page.locator(".clip-times").first
@@ -94,9 +90,7 @@ def test_selection_card_timestamps(
     expect(clip_times).to_contain_text("4:30")
 
 
-def test_selection_card_stream_link(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_selection_card_stream_link(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """Selection card has a link back to the stream detail page."""
     _goto_selections(page, live_server_url)
     link = page.locator(".clip-times a").first
@@ -107,18 +101,14 @@ def test_selection_card_stream_link(
 # ── Reject button ─────────────────────────────────────────────────────────────
 
 
-def test_reject_button_visible(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_reject_button_visible(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """Each selection card has a '✘ 却下' button."""
     _goto_selections(page, live_server_url)
     expect(page.locator(".btn-reject")).to_be_visible()
     expect(page.locator(".btn-reject")).to_contain_text("却下")
 
 
-def test_reject_button_sends_post(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_reject_button_sends_post(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """Clicking '✘ 却下' sends an HTMX POST to /api/clips/selections/<id>/reject."""
     _goto_selections(page, live_server_url)
 
@@ -126,12 +116,12 @@ def test_reject_button_sends_post(
     sel_id = (card.get_attribute("id") or "").replace("sel-", "")
 
     posted: list[str] = []
-    page.on(
-        "request",
-        lambda r: posted.append(r.url)
-        if "reject" in r.url and r.method == "POST"
-        else None,
-    )
+
+    def _on_request(r: Request) -> None:
+        if "reject" in r.url and r.method == "POST":
+            posted.append(r.url)
+
+    page.on("request", _on_request)
 
     page.locator(".btn-reject").first.click()
     page.wait_for_timeout(600)
@@ -141,19 +131,17 @@ def test_reject_button_sends_post(
     )
 
 
-def test_reject_changes_card_status(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_reject_changes_card_status(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """After rejection the POST request is accepted by the server (200)."""
     _goto_selections(page, live_server_url)
 
     responses: list[tuple[str, int]] = []
-    page.on(
-        "response",
-        lambda r: responses.append((r.url, r.status))
-        if "reject" in r.url
-        else None,
-    )
+
+    def _on_response(r: Response) -> None:
+        if "reject" in r.url:
+            responses.append((r.url, r.status))
+
+    page.on("response", _on_response)
 
     page.locator(".btn-reject").first.click()
     page.wait_for_timeout(600)
@@ -165,9 +153,7 @@ def test_reject_changes_card_status(
 # ── Delete button ─────────────────────────────────────────────────────────────
 
 
-def test_delete_button_visible(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_delete_button_visible(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """Each selection card has a '🗑 削除' button."""
     _goto_selections(page, live_server_url)
     expect(page.locator(".btn-danger")).to_be_visible()
@@ -182,7 +168,12 @@ def test_delete_button_shows_confirm_dialog(
 
     # htmx uses a window.confirm() dialog when hx-confirm is set
     dialog_texts: list[str] = []
-    page.on("dialog", lambda d: (dialog_texts.append(d.message), d.dismiss()))
+
+    def _on_dialog(d: Dialog) -> None:
+        dialog_texts.append(d.message)
+        d.dismiss()
+
+    page.on("dialog", _on_dialog)
 
     page.locator(".btn-danger").first.click()
     page.wait_for_timeout(400)
@@ -206,15 +197,18 @@ def test_delete_confirmed_removes_card(
     sel_id = (card.get_attribute("id") or "").replace("sel-", "")
 
     deleted_responses: list[tuple[str, int]] = []
-    page.on(
-        "response",
-        lambda r: deleted_responses.append((r.url, r.status))
-        if r.request.method == "DELETE" and "selections" in r.url
-        else None,
-    )
+
+    def _on_delete_response(r: Response) -> None:
+        if r.request.method == "DELETE" and "selections" in r.url:
+            deleted_responses.append((r.url, r.status))
+
+    page.on("response", _on_delete_response)
 
     # Accept the confirm dialog
-    page.on("dialog", lambda d: d.accept())
+    def _accept_dialog(d: Dialog) -> None:
+        d.accept()
+
+    page.on("dialog", _accept_dialog)
     page.locator(".btn-danger").first.click()
     page.wait_for_timeout(800)
 
@@ -222,17 +216,13 @@ def test_delete_confirmed_removes_card(
     assert any(sel_id in url for url, _ in deleted_responses), (
         f"Expected DELETE for {sel_id!r}, got: {deleted_responses}"
     )
-    assert deleted_responses[0][1] == 204, (
-        f"Expected 204 No Content, got {deleted_responses[0][1]}"
-    )
+    assert deleted_responses[0][1] == 204, f"Expected 204 No Content, got {deleted_responses[0][1]}"
 
 
 # ── Navigation ────────────────────────────────────────────────────────────────
 
 
-def test_nav_stream_link_goes_to_home(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_nav_stream_link_goes_to_home(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """Clicking 'Streams' in the nav navigates to /."""
     _goto_selections(page, live_server_url)
     page.get_by_role("link", name="Streams").click()

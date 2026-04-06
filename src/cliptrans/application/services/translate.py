@@ -35,7 +35,7 @@ class TranslateService:
 
         for i in range(0, len(utterances), self._chunk_size):
             chunk = utterances[i : i + self._chunk_size]
-            context = translated[-self._context_size:] if translated else None
+            context = translated[-self._context_size :] if translated else None
 
             chunk_translated = await self._translator.translate(
                 chunk,

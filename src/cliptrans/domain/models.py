@@ -109,6 +109,7 @@ class Job(BaseModel):
 
 class ChannelInfo(BaseModel):
     """Holodex から取得したチャンネル情報"""
+
     id: str
     name: str
     english_name: str | None = None
@@ -119,6 +120,7 @@ class ChannelInfo(BaseModel):
 
 class StreamInfo(BaseModel):
     """Holodex から取得した配信メタデータ"""
+
     video_id: str
     title: str
     channel_id: str
@@ -134,6 +136,7 @@ class StreamInfo(BaseModel):
 
 class ChatDensity(BaseModel):
     """時間窓ごとのチャット密度"""
+
     start: float  # 秒
     end: float
     count: int
@@ -142,6 +145,7 @@ class ChatDensity(BaseModel):
 
 class ClipCandidate(BaseModel):
     """LLM が提案する切り抜き候補"""
+
     id: UUID = Field(default_factory=uuid4)
     stream_id: str
     start: float
@@ -156,6 +160,7 @@ class ClipCandidate(BaseModel):
 
 class ClipSelection(BaseModel):
     """人間が確定した切り抜き区間"""
+
     id: UUID = Field(default_factory=uuid4)
     stream_id: str
     start: float

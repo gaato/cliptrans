@@ -99,6 +99,7 @@ async def find_candidates_html(
         await repo.save_candidates(candidates)
     except Exception as exc:
         import traceback
+
         error_msg = str(exc) or traceback.format_exc().splitlines()[-1]
         return HTMLResponse(
             f'<p class="empty-message" style="color:var(--red)">エラー: {error_msg}</p>',
@@ -128,6 +129,7 @@ async def find_candidates_sse(
             if event["type"] == "done":
                 # Save to DB, then render the HTML fragment
                 from cliptrans.domain.models import ClipCandidate
+
                 candidates = [ClipCandidate(**c) for c in event["candidates"]]
                 await repo.save_candidates(candidates)
                 html = _templates.get_template("_candidates_fragment.html").render(
@@ -147,6 +149,7 @@ async def find_candidates_sse(
 def _parse_srt(srt_text: str) -> list[dict]:
     """Parse SRT into list of {start, end, start_sec, text} dicts."""
     import re
+
     block_re = re.compile(
         r"\d+\r?\n"
         r"(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})\r?\n"
@@ -165,12 +168,14 @@ def _parse_srt(srt_text: str) -> list[dict]:
         start_ts, end_ts = m.group(1), m.group(2)
         text = m.group(3).strip().replace("\n", " ")
         if text:
-            lines.append({
-                "start": start_ts[:8],  # HH:MM:SS
-                "end": end_ts[:8],
-                "start_sec": ts_to_sec(start_ts),
-                "text": text,
-            })
+            lines.append(
+                {
+                    "start": start_ts[:8],  # HH:MM:SS
+                    "end": end_ts[:8],
+                    "start_sec": ts_to_sec(start_ts),
+                    "text": text,
+                }
+            )
     return lines
 
 

@@ -27,6 +27,7 @@ def _stream_browser(cfg: Config) -> StreamBrowserService:
 
     if not cfg.holodex_api_key:
         from cliptrans.adapters.holodex import _StubHolodex
+
         return SBS(_StubHolodex())
     return SBS(HolodexAdapter(cfg.holodex_api_key))
 
@@ -71,6 +72,7 @@ ClipFinder = Annotated[ClipFinderService, Depends(_clip_finder)]
 
 def _subtitle_fetcher():
     from cliptrans.adapters.subtitle_fetcher import YtdlpSubtitleFetcher
+
     return YtdlpSubtitleFetcher()
 
 

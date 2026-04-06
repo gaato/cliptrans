@@ -33,9 +33,12 @@ class YtdlpDownloader:
         cmd = [
             "yt-dlp",
             "--no-playlist",
-            "--format", "bestvideo+bestaudio/best",
-            "--merge-output-format", "mp4",
-            "--output", output_template,
+            "--format",
+            "bestvideo+bestaudio/best",
+            "--merge-output-format",
+            "mp4",
+            "--output",
+            output_template,
             "--print-json",
         ]
 

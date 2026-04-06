@@ -14,7 +14,7 @@ from cliptrans.domain.models import ClipCandidate
 
 
 class _RawCandidate(BaseModel):
-    start_time: str   # "HH:MM:SS,mmm"
+    start_time: str  # "HH:MM:SS,mmm"
     end_time: str
     title: str
     reason: str

@@ -41,15 +41,11 @@ def run(
     start: Annotated[
         float | None, typer.Option("--start", "-s", help="Start time in seconds")
     ] = None,
-    end: Annotated[
-        float | None, typer.Option("--end", "-e", help="End time in seconds")
-    ] = None,
+    end: Annotated[float | None, typer.Option("--end", "-e", help="End time in seconds")] = None,
     source_lang: Annotated[str, typer.Option("--source-lang")] = "ja",
     target_lang: Annotated[str, typer.Option("--target-lang")] = "en",
     asr_model: Annotated[str, typer.Option("--asr-model")] = "large-v3",
-    export_formats: Annotated[
-        list[ExportFormat] | None, typer.Option("--format", "-f")
-    ] = None,
+    export_formats: Annotated[list[ExportFormat] | None, typer.Option("--format", "-f")] = None,
     no_translate: Annotated[
         bool, typer.Option("--no-translate", help="Skip translation step")
     ] = False,

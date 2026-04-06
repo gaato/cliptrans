@@ -35,6 +35,7 @@ import sqlite3
 import threading
 import time
 import urllib.request
+from collections.abc import Generator
 from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
@@ -65,9 +66,7 @@ class MockHolodex:
     async def list_live_streams(self, *, org=None, limit=50) -> list[StreamInfo]:
         return []
 
-    async def list_past_streams(
-        self, *, channel_id=None, org=None, limit=50
-    ) -> list[StreamInfo]:
+    async def list_past_streams(self, *, channel_id=None, org=None, limit=50) -> list[StreamInfo]:
         streams = [KIARA_STREAM]
         if channel_id and channel_id != KIARA_CHANNEL_ID:
             return []
@@ -111,7 +110,7 @@ def e2e_db_url(e2e_db_file: Path) -> str:
 
 
 @pytest.fixture(scope="session")
-def live_server_url(e2e_db_file: Path, e2e_db_url: str) -> str:  # type: ignore[return]
+def live_server_url(e2e_db_file: Path, e2e_db_url: str) -> Generator[str]:
     """Start uvicorn in a background daemon thread.  Returns the base URL.
 
     The server uses:
@@ -138,7 +137,7 @@ def live_server_url(e2e_db_file: Path, e2e_db_url: str) -> str:  # type: ignore[
     base_url = f"http://127.0.0.1:{_E2E_PORT}"
     _wait_for_server(base_url + "/")
 
-    yield base_url  # type: ignore[misc]
+    yield base_url
 
     server.should_exit = True
     thread.join(timeout=5)
@@ -146,8 +145,9 @@ def live_server_url(e2e_db_file: Path, e2e_db_url: str) -> str:  # type: ignore[
 
 # ── DB seeding ────────────────────────────────────────────────────────────────
 
+
 @pytest.fixture()
-def seeded_clips(e2e_db_file: Path) -> dict:  # type: ignore[return]
+def seeded_clips(e2e_db_file: Path) -> Generator[dict]:  # type: ignore[type-arg]
     """Insert clip candidates and one selection; clean up after the test.
 
     Uses raw ``sqlite3`` to avoid async/event-loop conflicts with pytest-asyncio.

@@ -21,7 +21,7 @@ jobs:
           python-version-file: ".python-version"
 
       - name: Install dev dependencies
-        run: uv sync --group dev
+        run: uv sync --group dev --extra web
 
       - name: Run ruff (lint)
         run: uv run ruff check .
@@ -43,7 +43,7 @@ jobs:
           python-version-file: ".python-version"
 
       - name: Install dev dependencies
-        run: uv sync --group dev
+        run: uv sync --group dev --extra web
 
       - name: Run ty
         run: uv run ty check
@@ -62,7 +62,7 @@ jobs:
           python-version-file: ".python-version"
 
       - name: Install dev dependencies
-        run: uv sync --group dev
+        run: uv sync --group dev --extra web
 
       - name: Run tests
         run: uv run pytest -m "not gpu and not slow and not integration and not e2e" --cov=src --cov-report=xml

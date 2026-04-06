@@ -16,6 +16,7 @@ Covers
 
 from __future__ import annotations
 
+import contextlib
 import json
 import re
 
@@ -64,17 +65,13 @@ def test_detail_meta_shows_channel_and_org(
     expect(meta).to_contain_text("2h")
 
 
-def test_detail_yt_player_area_exists(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_detail_yt_player_area_exists(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """The YouTube player wrapper element is present in the DOM."""
     _open_detail(page, live_server_url)
     expect(page.locator("#yt-player-wrapper")).to_be_attached()
 
 
-def test_detail_seek_input_and_button(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_detail_seek_input_and_button(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """The seek controls (number input and ▶ Seek button) are visible."""
     _open_detail(page, live_server_url)
     expect(page.locator("#seek-input")).to_be_visible()
@@ -93,18 +90,14 @@ def test_candidates_tab_is_active_by_default(
     assert "active" in (candidates_tab.get_attribute("class") or "")
 
 
-def test_candidate_cards_visible(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_candidate_cards_visible(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """All three seeded clip candidates appear as cards."""
     _open_detail(page, live_server_url)
     cards = page.locator("#candidates-list .clip-card")
     expect(cards).to_have_count(3)
 
 
-def test_candidate_card_shows_title(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_candidate_card_shows_title(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """Each candidate card shows its title text."""
     _open_detail(page, live_server_url)
     first_card = page.locator("#candidates-list .clip-card").first
@@ -143,9 +136,7 @@ def test_candidate_card_shows_confidence_badge(
     expect(conf_badge).to_contain_text("%")
 
 
-def test_candidate_tab_count_label(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_candidate_tab_count_label(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """The 候補 tab button label shows the count of candidates."""
     _open_detail(page, live_server_url)
     tab_btn = page.locator(".tab-bar button").nth(0)
@@ -169,18 +160,14 @@ def test_ai_find_button_present_and_enabled(
 # ── Approve (採用) button ─────────────────────────────────────────────────────
 
 
-def test_approve_button_visible(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_approve_button_visible(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """Each candidate card has a '✔ 採用' button."""
     _open_detail(page, live_server_url)
     approve_btns = page.locator("#candidates-list .btn-approve")
     expect(approve_btns).to_have_count(3)
 
 
-def test_approve_button_sends_post(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_approve_button_sends_post(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """Clicking '✔ 採用' sends an HTMX POST to /api/clips/approve.
 
     We capture the outgoing request and verify the JSON body contains the
@@ -189,16 +176,15 @@ def test_approve_button_sends_post(
     _open_detail(page, live_server_url)
 
     first_card = page.locator("#candidates-list .clip-card").first
-    first_cid = first_card.get_attribute("id").replace("cand-", "")  # type: ignore[union-attr]
+    raw_id = first_card.get_attribute("id") or ""
+    first_cid = raw_id.replace("cand-", "")
 
     posted: list[dict] = []
 
     def _capture(request: Request) -> None:
         if "/api/clips/approve" in request.url and request.method == "POST":
-            try:
+            with contextlib.suppress(Exception):
                 posted.append(request.post_data_json or json.loads(request.post_data or "{}"))
-            except Exception:
-                pass
 
     page.on("request", _capture)
     first_card.locator(".btn-approve").click()
@@ -211,9 +197,7 @@ def test_approve_button_sends_post(
 # ── Selections tab ────────────────────────────────────────────────────────────
 
 
-def test_selections_tab_switch(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_selections_tab_switch(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """Clicking 確定 tab shows the selection cards and hides candidate cards."""
     _open_detail(page, live_server_url)
     page.locator(".tab-bar button").nth(1).click()
@@ -228,9 +212,7 @@ def test_selections_tab_switch(
     expect(cand_list).to_be_hidden()
 
 
-def test_selections_tab_count_label(
-    page: Page, live_server_url: str, seeded_clips: dict
-) -> None:
+def test_selections_tab_count_label(page: Page, live_server_url: str, seeded_clips: dict) -> None:
     """The 確定 tab button shows the count of selections."""
     _open_detail(page, live_server_url)
     tab_btn = page.locator(".tab-bar button").nth(1)
@@ -259,10 +241,12 @@ def test_transcript_tab_fires_htmx_request(
     _open_detail(page, live_server_url)
 
     htmx_requests: list[str] = []
-    page.on(
-        "request",
-        lambda r: htmx_requests.append(r.url) if "htmx/transcript" in r.url else None,
-    )
+
+    def _on_htmx(r: Request) -> None:
+        if "htmx/transcript" in r.url:
+            htmx_requests.append(r.url)
+
+    page.on("request", _on_htmx)
 
     page.locator(".tab-bar button").nth(2).click()
     page.wait_for_timeout(600)
@@ -279,10 +263,12 @@ def test_transcript_tab_only_fires_once(
     _open_detail(page, live_server_url)
 
     htmx_requests: list[str] = []
-    page.on(
-        "request",
-        lambda r: htmx_requests.append(r.url) if "htmx/transcript" in r.url else None,
-    )
+
+    def _on_htmx(r: Request) -> None:
+        if "htmx/transcript" in r.url:
+            htmx_requests.append(r.url)
+
+    page.on("request", _on_htmx)
 
     transcript_tab = page.locator(".tab-bar button").nth(2)
     transcript_tab.click()
@@ -308,10 +294,12 @@ def test_candidate_transcript_details_fires_htmx(
     _open_detail(page, live_server_url)
 
     htmx_requests: list[str] = []
-    page.on(
-        "request",
-        lambda r: htmx_requests.append(r.url) if "htmx/transcript" in r.url else None,
-    )
+
+    def _on_htmx(r: Request) -> None:
+        if "htmx/transcript" in r.url:
+            htmx_requests.append(r.url)
+
+    page.on("request", _on_htmx)
 
     first_card = page.locator("#candidates-list .clip-card").first
     first_card.locator("details summary").click()
@@ -365,13 +353,13 @@ def test_manual_form_submit_creates_selection(
     form.locator("input[name='notes']").fill("Added by test")
 
     posted: list[str] = []
-    page.on(
-        "request",
-        lambda r: posted.append(r.url) if "/api/clips/create" in r.url else None,
-    )
+
+    def _on_request(r: Request) -> None:
+        if "/api/clips/create" in r.url:
+            posted.append(r.url)
+
+    page.on("request", _on_request)
     form.locator("button[type='submit']").click()
     page.wait_for_timeout(500)
 
-    assert any("/api/clips/create" in url for url in posted), (
-        "Expected POST to /api/clips/create"
-    )
+    assert any("/api/clips/create" in url for url in posted), "Expected POST to /api/clips/create"

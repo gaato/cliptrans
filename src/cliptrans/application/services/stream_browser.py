@@ -25,9 +25,7 @@ class StreamBrowserService:
         org: str | None = None,
         limit: int = 50,
     ) -> list[StreamInfo]:
-        return await self._holodex.list_past_streams(
-            channel_id=channel_id, org=org, limit=limit
-        )
+        return await self._holodex.list_past_streams(channel_id=channel_id, org=org, limit=limit)
 
     async def get_stream(self, video_id: str) -> StreamInfo:
         return await self._holodex.get_stream(video_id)

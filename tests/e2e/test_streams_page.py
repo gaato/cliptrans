@@ -139,9 +139,7 @@ def test_status_defaults_to_past(page: Page, live_server_url: str) -> None:
 # override the suggest response independently of the server mock.
 
 
-def test_channel_autocomplete_appears_on_partial_input(
-    page: Page, live_server_url: str
-) -> None:
+def test_channel_autocomplete_appears_on_partial_input(page: Page, live_server_url: str) -> None:
     """Typing a partial name ('kiar') shows the suggestion dropdown."""
     _goto(page, live_server_url)
     inp = page.get_by_placeholder("キアラ / Kobo …")
@@ -193,7 +191,8 @@ def test_channel_autocomplete_select_navigates(page: Page, live_server_url: str)
     page.wait_for_load_state("networkidle")
 
     assert f"channel_id={KIARA_CHANNEL_ID}" in page.url
-    assert "channel_name=Takanashi+Kiara" in page.url or "channel_name=Takanashi%20Kiara" in page.url
+    encoded_name = "Takanashi+Kiara" in page.url or "Takanashi%20Kiara" in page.url
+    assert encoded_name
 
 
 def test_channel_autocomplete_shows_selected_label(page: Page, live_server_url: str) -> None:
@@ -236,9 +235,7 @@ def test_channel_autocomplete_clear_button(page: Page, live_server_url: str) -> 
     expect(selected).to_be_hidden()
 
 
-def test_channel_autocomplete_escape_clears_suggestions(
-    page: Page, live_server_url: str
-) -> None:
+def test_channel_autocomplete_escape_clears_suggestions(page: Page, live_server_url: str) -> None:
     """Pressing Escape hides the suggestions without selecting."""
     _goto(page, live_server_url)
     inp = page.get_by_placeholder("キアラ / Kobo …")
@@ -264,15 +261,17 @@ def test_channel_autocomplete_via_page_route(page: Page, live_server_url: str) -
     This technique is useful when you want deterministic fixture data that is
     independent of the server's mock implementation.
     """
-    kiara_payload = json.dumps([
-        {
-            "id": KIARA_CHANNEL_ID,
-            "name": "Takanashi Kiara Ch. hololive-EN",
-            "english_name": "Takanashi Kiara",
-            "photo": "",
-            "org": "Hololive",
-        }
-    ])
+    kiara_payload = json.dumps(
+        [
+            {
+                "id": KIARA_CHANNEL_ID,
+                "name": "Takanashi Kiara Ch. hololive-EN",
+                "english_name": "Takanashi Kiara",
+                "photo": "",
+                "org": "Hololive",
+            }
+        ]
+    )
 
     def _intercept(route: Route) -> None:
         route.fulfill(
@@ -292,9 +291,7 @@ def test_channel_autocomplete_via_page_route(page: Page, live_server_url: str) -
     expect(page.locator(".channel-suggestions")).to_contain_text("Takanashi Kiara")
 
 
-def test_channel_autocomplete_api_error_is_silent(
-    page: Page, live_server_url: str
-) -> None:
+def test_channel_autocomplete_api_error_is_silent(page: Page, live_server_url: str) -> None:
     """If the suggest API returns 500, the UI shows no suggestions (no crash)."""
 
     def _error(route: Route) -> None:

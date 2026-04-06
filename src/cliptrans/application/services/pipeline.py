@@ -82,6 +82,7 @@ class PipelineOrchestrator:
                 dest = job.data_dir / ("video" + local_file.suffix)
                 if not dest.exists():
                     import shutil
+
                     shutil.copy2(local_file, dest)
                 video_path = dest
                 # Mark ingest as completed so --resume also skips it
