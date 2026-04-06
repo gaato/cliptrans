@@ -31,6 +31,7 @@ server — the ``test_channel_autocomplete_api_error`` test demonstrates this.
 
 from __future__ import annotations
 
+import socket
 import sqlite3
 import threading
 import time
@@ -84,7 +85,12 @@ class MockHolodex:
 
 # ── Live server ────────────────────────────────────────────────────────────────
 
-_E2E_PORT = 18_765
+
+def _get_free_port() -> int:
+    """Return an ephemeral port that is free on 127.0.0.1 at the time of calling."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
 
 
 def _wait_for_server(url: str, timeout: float = 10.0) -> None:
@@ -129,12 +135,13 @@ def live_server_url(e2e_db_file: Path, e2e_db_url: str) -> Generator[str]:
     app.dependency_overrides[_stream_browser] = lambda: mock_browser
     app.dependency_overrides[_clip_repo] = lambda: mock_repo
 
-    config = uvicorn.Config(app, host="127.0.0.1", port=_E2E_PORT, log_level="warning")
+    port = _get_free_port()
+    config = uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning")
     server = uvicorn.Server(config)
     thread = threading.Thread(target=server.run, daemon=True)
     thread.start()
 
-    base_url = f"http://127.0.0.1:{_E2E_PORT}"
+    base_url = f"http://127.0.0.1:{port}"
     _wait_for_server(base_url + "/")
 
     yield base_url
