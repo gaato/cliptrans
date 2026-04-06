@@ -91,8 +91,8 @@ def _wait_for_server(url: str, timeout: float = 10.0) -> None:
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         try:
-            urllib.request.urlopen(url, timeout=1)
-            return
+            with urllib.request.urlopen(url, timeout=1):
+                return
         except Exception:
             time.sleep(0.2)
     raise RuntimeError(f"Live server at {url} did not start within {timeout}s")
