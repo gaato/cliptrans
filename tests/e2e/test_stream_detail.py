@@ -189,7 +189,7 @@ def test_approve_button_sends_post(
     _open_detail(page, live_server_url)
 
     first_card = page.locator("#candidates-list .clip-card").first
-    first_cid = first_card.get_attribute("id", ).replace("cand-", "")  # type: ignore[union-attr]
+    first_cid = first_card.get_attribute("id").replace("cand-", "")  # type: ignore[union-attr]
 
     posted: list[dict] = []
 
