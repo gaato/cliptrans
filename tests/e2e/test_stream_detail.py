@@ -338,7 +338,7 @@ def test_manual_form_has_required_fields(
     expect(form.locator("input[name='notes']")).to_be_visible()
 
 
-def test_manual_form_submit_creates_selection(
+def test_manual_form_submit_sends_create_request(
     page: Page, live_server_url: str, seeded_clips: dict
 ) -> None:
     """Filling and submitting the manual form POSTs to /api/clips/create."""

@@ -251,8 +251,10 @@ def test_channel_autocomplete_escape_clears_suggestions(page: Page, live_server_
 
 # ── page.route() — browser-level request interception ────────────────────────
 #
-# These tests show how to override the suggest endpoint at the browser level
-# so tests remain fully self-contained even without a running server.
+# These tests show how to override the suggest endpoint at the browser level.
+# The server is still required (live_server_url / _goto() hit the real app),
+# but page.route() lets individual tests inject deterministic fixture data
+# that is independent of the server's own mock implementation.
 
 
 def test_channel_autocomplete_via_page_route(page: Page, live_server_url: str) -> None:

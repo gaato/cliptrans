@@ -181,7 +181,7 @@ def test_delete_button_shows_confirm_dialog(
     assert "削除" in dialog_texts[0] or "本当に" in dialog_texts[0]
 
 
-def test_delete_confirmed_removes_card(
+def test_delete_confirmed_sends_delete_request(
     page: Page, live_server_url: str, seeded_clips: dict
 ) -> None:
     """Confirming deletion sends DELETE to /api/clips/selections/<id> (204).
