@@ -5,14 +5,13 @@ Covers
 * Page title
 * Selection cards rendered from DB
 * Each card shows stream link, timestamps, title, status badge
-* "✘ Reject" sends HTMX POST and the card is replaced
 * "🗑 Delete" prompts for confirmation, then sends HTMX DELETE
 """
 
 from __future__ import annotations
 
 import pytest
-from playwright.sync_api import Dialog, Page, Request, Response, expect
+from playwright.sync_api import Dialog, Page, Response, expect
 
 from e2e.fixtures import TEST_VIDEO_ID
 
@@ -97,58 +96,6 @@ def test_selection_card_stream_link(page: Page, live_server_url: str, seeded_cli
     expect(link).to_contain_text(TEST_VIDEO_ID)
 
 
-# Reject button
-
-
-def test_reject_button_visible(page: Page, live_server_url: str, seeded_clips: dict) -> None:
-    """Each selection card has a '✘ Reject' button."""
-    _goto_selections(page, live_server_url)
-    expect(page.locator(".btn-reject")).to_be_visible()
-    expect(page.locator(".btn-reject")).to_contain_text("Reject")
-
-
-def test_reject_button_sends_post(page: Page, live_server_url: str, seeded_clips: dict) -> None:
-    """Clicking '✘ Reject' sends an HTMX POST to /api/clips/selections/<id>/reject."""
-    _goto_selections(page, live_server_url)
-
-    card = page.locator(".clip-card").first
-    sel_id = (card.get_attribute("id") or "").replace("sel-", "")
-
-    posted: list[str] = []
-
-    def _on_request(r: Request) -> None:
-        if "reject" in r.url and r.method == "POST":
-            posted.append(r.url)
-
-    page.on("request", _on_request)
-
-    page.locator(".btn-reject").first.click()
-    page.wait_for_timeout(600)
-
-    assert any(sel_id in url for url in posted), (
-        f"Expected POST to .../reject with {sel_id!r}, got: {posted}"
-    )
-
-
-def test_reject_changes_card_status(page: Page, live_server_url: str, seeded_clips: dict) -> None:
-    """After rejection the POST request is accepted by the server (200)."""
-    _goto_selections(page, live_server_url)
-
-    responses: list[tuple[str, int]] = []
-
-    def _on_response(r: Response) -> None:
-        if "reject" in r.url:
-            responses.append((r.url, r.status))
-
-    page.on("response", _on_response)
-
-    page.locator(".btn-reject").first.click()
-    page.wait_for_timeout(600)
-
-    assert responses, "No response received for reject endpoint"
-    assert responses[0][1] == 200, f"Expected 200, got {responses[0][1]}"
-
-
 # Delete button
 
 
@@ -184,12 +131,7 @@ def test_delete_button_shows_confirm_dialog(
 def test_delete_confirmed_sends_delete_request(
     page: Page, live_server_url: str, seeded_clips: dict
 ) -> None:
-    """Confirming deletion sends DELETE to /api/clips/selections/<id> (204).
-
-    Note: HTMX 1.9.x does not perform a DOM swap on 204 No Content responses,
-    so the card is not automatically removed from the page by the client.
-    The test verifies the DELETE request was accepted by the server (204).
-    """
+    """Confirming deletion sends DELETE to /api/clips/selections/<id> (200)."""
     _goto_selections(page, live_server_url)
 
     card = page.locator(".clip-card").first
@@ -215,7 +157,7 @@ def test_delete_confirmed_sends_delete_request(
     assert any(sel_id in url for url, _ in deleted_responses), (
         f"Expected DELETE for {sel_id!r}, got: {deleted_responses}"
     )
-    assert deleted_responses[0][1] == 204, f"Expected 204 No Content, got {deleted_responses[0][1]}"
+    assert deleted_responses[0][1] == 200, f"Expected 200 OK, got {deleted_responses[0][1]}"
 
 
 # Navigation

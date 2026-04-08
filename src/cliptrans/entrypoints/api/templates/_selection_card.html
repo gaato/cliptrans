@@ -1,0 +1,41 @@
+<div class="clip-card" id="sel-{{ s.id }}">
+  <div class="clip-times">
+    {% if page_kind == "stream" %}
+      <button class="time-btn" onclick="seekTo({{ s.start }})">
+        {{ '%d:%02d'|format(s.start|int // 60, s.start|int % 60) }}
+      </button>
+      →
+      <span>{{ '%d:%02d'|format(s.end|int // 60, s.end|int % 60) }}</span>
+    {% else %}
+      <a href="/stream/{{ s.stream_id }}">{{ s.stream_id }}</a>
+      &nbsp;
+      {{ '%d:%02d'|format(s.start|int // 60, s.start|int % 60) }}
+      →
+      {{ '%d:%02d'|format(s.end|int // 60, s.end|int % 60) }}
+    {% endif %}
+  </div>
+  <p class="clip-title">{{ s.title }}</p>
+  {% if s.notes %}<p class="clip-reason">{{ s.notes }}</p>{% endif %}
+  <div class="clip-meta">
+    <span class="badge badge-status-{{ s.status }}">{{ s.status }}</span>
+  </div>
+  <div class="clip-actions">
+    {% if page_kind == "stream" %}
+      <button
+        hx-delete="/api/clips/selections/{{ s.id }}"
+        hx-target="#sel-{{ s.id }}"
+        hx-swap="delete"
+        hx-confirm="Remove this selection?"
+        class="btn btn-danger"
+      >Remove</button>
+    {% else %}
+      <button
+        hx-delete="/api/clips/selections/{{ s.id }}"
+        hx-target="#sel-{{ s.id }}"
+        hx-swap="delete"
+        hx-confirm="Delete this selection?"
+        class="btn btn-danger"
+      >🗑 Delete</button>
+    {% endif %}
+  </div>
+</div>

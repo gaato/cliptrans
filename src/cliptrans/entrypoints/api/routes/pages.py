@@ -63,7 +63,7 @@ async def stream_detail(request: Request, video_id: str, browser: StreamBrowser,
     else:
         error = None
     candidates = await repo.get_candidates(video_id) if stream else []
-    selections = await repo.get_selections(stream_id=video_id) if stream else []
+    selections = await repo.get_selections(stream_id=video_id, status="pending") if stream else []
     return _templates.TemplateResponse(
         request=request,
         name="stream_detail.html",

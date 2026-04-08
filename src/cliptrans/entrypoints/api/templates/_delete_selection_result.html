@@ -1,0 +1,11 @@
+{% if page_kind == "stream" %}
+<span id="selection-count-label" hx-swap-oob="outerHTML">Selections ({{ selection_count }})</span>
+<div id="clip-feedback" hx-swap-oob="innerHTML">
+  <p class="action-feedback">Removed selection.</p>
+</div>
+{% endif %}
+{% if selection_count == 0 %}
+<div hx-swap-oob="beforeend:#selections-list">
+  <p id="selections-empty" class="empty-message">No selections yet.</p>
+</div>
+{% endif %}

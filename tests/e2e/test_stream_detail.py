@@ -9,7 +9,7 @@ Covers
 * Transcript tab fires an HTMX GET request to /htmx/transcript/<video_id>
 * "🤖 Find clip candidates with AI" button visible and enabled
 * "✔ Approve" HTMX POST is sent with the correct candidate_id
-* "✘ Reject" button is visible in the selections tab
+* "Remove" button is visible in the selections tab
 * Manual clip form (``<details>``) opens and has the expected fields
 * Time buttons (seekTo) carry correct timestamps
 """
@@ -219,16 +219,16 @@ def test_selections_tab_count_label(page: Page, live_server_url: str, seeded_cli
     expect(tab_btn).to_contain_text("Selections (1)")
 
 
-def test_selection_card_has_reject_button(
+def test_selection_card_has_remove_button(
     page: Page, live_server_url: str, seeded_clips: dict
 ) -> None:
-    """Selection cards have a '✘ Reject' button."""
+    """Selection cards have a 'Remove' button."""
     _open_detail(page, live_server_url)
     page.locator(".tab-bar button").nth(1).click()
     page.wait_for_timeout(300)
-    reject_btn = page.locator(".clip-list").nth(1).locator(".btn-reject")
-    expect(reject_btn).to_be_visible()
-    expect(reject_btn).to_contain_text("Reject")
+    remove_btn = page.locator(".clip-list").nth(1).locator(".btn-danger")
+    expect(remove_btn).to_be_visible()
+    expect(remove_btn).to_contain_text("Remove")
 
 
 # Transcript tab

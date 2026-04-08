@@ -1,0 +1,11 @@
+<span id="candidate-count-label" hx-swap-oob="outerHTML">Candidates ({{ candidate_count }})</span>
+<span id="selection-count-label" hx-swap-oob="outerHTML">Selections ({{ selection_count }})</span>
+<div id="selections-empty" hx-swap-oob="outerHTML"></div>
+<div id="clip-feedback" hx-swap-oob="innerHTML">
+  <p class="action-feedback action-feedback-success">Approved "{{ selection.title }}" and moved it to Selections.</p>
+</div>
+{% set s = selection %}
+{% set page_kind = "stream" %}
+<div hx-swap-oob="beforeend:#selections-list">
+  {% include "_selection_card.html" %}
+</div>

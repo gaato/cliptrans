@@ -105,6 +105,12 @@ class SQLAlchemyClipRepository:
             row = await session.get(ClipCandidateRow, str(candidate_id))
             return _row_to_candidate(row) if row else None
 
+    async def delete_candidate(self, candidate_id: UUID) -> None:
+        async with session_scope(self._database_url) as session:
+            row = await session.get(ClipCandidateRow, str(candidate_id))
+            if row:
+                await session.delete(row)
+
     async def delete_candidates(self, stream_id: str) -> None:
         async with session_scope(self._database_url) as session:
             result = await session.execute(
