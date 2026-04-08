@@ -12,7 +12,7 @@ from cliptrans.application.services.export import ExportService
 from cliptrans.domain.enums import ExportFormat
 from cliptrans.domain.models import Timeline
 
-# ── Timestamp helpers ─────────────────────────────────────────────────────────
+# Timestamp helpers
 
 
 class TestTimestampFormatters:
@@ -37,7 +37,7 @@ class TestTimestampFormatters:
         assert "," not in result
 
 
-# ── SRT ───────────────────────────────────────────────────────────────────────
+# SRT
 
 
 class TestSRTExporter:
@@ -96,7 +96,7 @@ class TestExportService:
         assert "Hello, everyone." in content
 
 
-# ── VTT ───────────────────────────────────────────────────────────────────────
+# VTT
 
 
 class TestVTTExporter:
@@ -116,7 +116,7 @@ class TestVTTExporter:
             assert "," not in line
 
 
-# ── ASS ───────────────────────────────────────────────────────────────────────
+# ASS
 
 
 class TestASSExporter:

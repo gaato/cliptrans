@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from cliptrans.config import AppConfig, get_config
 
-# ── Adapters ──────────────────────────────────────────────────────────────────
+# Adapters
 
 
 def make_downloader(config: AppConfig | None = None):
@@ -51,7 +51,7 @@ def make_job_repository(config: AppConfig | None = None):
     return SQLAlchemyJobRepository(database_url=cfg.database_url)
 
 
-# ── Services ──────────────────────────────────────────────────────────────────
+# Services
 
 
 def make_pipeline(config: AppConfig | None = None):

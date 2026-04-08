@@ -26,7 +26,7 @@ from e2e.fixtures import KIARA_CHANNEL_ID, KIARA_STREAM, TEST_VIDEO_ID
 pytestmark = pytest.mark.e2e
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# Helpers
 
 
 def _goto(page: Page, live_server_url: str, path: str = "/") -> None:
@@ -36,7 +36,7 @@ def _goto(page: Page, live_server_url: str, path: str = "/") -> None:
     page.wait_for_timeout(800)
 
 
-# ── Basic page load ───────────────────────────────────────────────────────────
+# Basic page load
 
 
 def test_page_title(page: Page, live_server_url: str) -> None:
@@ -53,7 +53,7 @@ def test_navigation_links(page: Page, live_server_url: str) -> None:
     expect(nav.get_by_role("link", name="Selections")).to_be_visible()
 
 
-# ── Stream cards ──────────────────────────────────────────────────────────────
+# Stream cards
 
 
 def test_stream_cards_rendered(page: Page, live_server_url: str) -> None:
@@ -89,7 +89,7 @@ def test_stream_card_links_to_detail(page: Page, live_server_url: str) -> None:
     assert f"/stream/{TEST_VIDEO_ID}" in page.url
 
 
-# ── Filter form ───────────────────────────────────────────────────────────────
+# Filter form
 
 
 def test_filter_form_elements_visible(page: Page, live_server_url: str) -> None:
@@ -126,7 +126,7 @@ def test_status_defaults_to_past(page: Page, live_server_url: str) -> None:
     assert select.input_value() == "past"
 
 
-# ── Channel autocomplete ──────────────────────────────────────────────────────
+# Channel autocomplete
 #
 # Design note
 # -----------
@@ -249,7 +249,7 @@ def test_channel_autocomplete_escape_clears_suggestions(page: Page, live_server_
     expect(page.locator(".channel-suggestions")).to_be_hidden()
 
 
-# ── page.route() — browser-level request interception ────────────────────────
+# page.route() - browser-level request interception
 #
 # These tests show how to override the suggest endpoint at the browser level.
 # The server is still required (live_server_url / _goto() hit the real app),

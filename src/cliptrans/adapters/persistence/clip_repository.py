@@ -78,7 +78,7 @@ class SQLAlchemyClipRepository:
     def __init__(self, database_url: str) -> None:
         self._database_url = database_url
 
-    # ── Candidates ─────────────────────────────────────────────────────────
+    # Candidates
 
     async def save_candidate(self, candidate: ClipCandidate) -> None:
         async with session_scope(self._database_url) as session:
@@ -113,7 +113,7 @@ class SQLAlchemyClipRepository:
             for row in result.scalars():
                 await session.delete(row)
 
-    # ── Selections ──────────────────────────────────────────────────────────
+    # Selections
 
     async def save_selection(self, selection: ClipSelection) -> None:
         async with session_scope(self._database_url) as session:

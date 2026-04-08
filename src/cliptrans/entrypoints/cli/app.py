@@ -30,7 +30,7 @@ console = Console()
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
 
 
-# ── run ──────────────────────────────────────────────────────────────────────
+# run
 
 
 @cli_app.command()
@@ -154,7 +154,7 @@ async def _run_pipeline(
         console.print(f"Output: {job.data_dir / 'output'}")
 
 
-# ── jobs ─────────────────────────────────────────────────────────────────────
+# jobs
 
 
 @cli_app.command("jobs")
@@ -187,7 +187,7 @@ async def _list_jobs(status: JobStatus | None) -> None:
     console.print(table)
 
 
-# ── show ──────────────────────────────────────────────────────────────────────
+# show
 
 
 @cli_app.command("show")

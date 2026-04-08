@@ -1,4 +1,4 @@
-/* ─── Reset / Variables ────────────────────────────────────────────────────── */
+/* Reset / Variables */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -26,7 +26,7 @@ body {
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* ─── Nav ──────────────────────────────────────────────────────────────────── */
+/* Nav */
 header {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -42,14 +42,14 @@ nav {
 .nav-links a { color: var(--text-muted); font-size: 0.9rem; }
 .nav-links a:hover { color: var(--text); text-decoration: none; }
 
-/* ─── Main ─────────────────────────────────────────────────────────────────── */
+/* Main */
 main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
 
-/* ─── Page header ──────────────────────────────────────────────────────────── */
+/* Page header */
 .page-header { margin-bottom: 1.5rem; }
 .page-header h1 { font-size: 1.6rem; font-weight: 700; }
 
-/* ─── Filter form ──────────────────────────────────────────────────────────── */
+/* Filter form */
 .filter-form {
   display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end;
   margin-top: 1rem;
@@ -66,7 +66,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
   font-size: 0.9rem; align-self: flex-end;
 }
 
-/* ─── Channel search ─────────────────────────────────────────────────────── */
+/* Channel search */
 .channel-search-wrap { position: relative; }
 
 .channel-input-row { position: relative; min-width: 220px; }
@@ -110,7 +110,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
 .channel-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 .channel-avatar-sm { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; vertical-align: middle; }
 
-/* ─── Stream card channel row ───────────────────────────────────────────── */
+/* Stream card channel row */
 .stream-channel {
   display: flex; align-items: center; gap: 0.35rem;
   font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;
@@ -120,7 +120,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
   padding: 0.05rem 0.35rem; border-radius: 4px; font-size: 0.7rem;
 }
 
-/* ─── Stream grid ──────────────────────────────────────────────────────────── */
+/* Stream grid */
 .stream-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -147,7 +147,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
 .stream-meta  { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
 .stream-duration { font-size: 0.75rem; color: var(--text-muted); }
 
-/* ─── Badges ───────────────────────────────────────────────────────────────── */
+/* Badges */
 .badge {
   display: inline-block; padding: 0.15rem 0.5rem;
   border-radius: 9999px; font-size: 0.7rem; font-weight: 600;
@@ -166,7 +166,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
 .badge-status-done       { background: #4ecca333; color: #4ecca3; }
 .badge-status-rejected   { background: #e05c5c33; color: #e05c5c; }
 
-/* ─── Detail layout ─────────────────────────────────────────────────────────── */
+/* Detail layout */
 .stream-detail-header { margin-bottom: 1.5rem; }
 .stream-detail-header h1 { font-size: 1.4rem; font-weight: 700; }
 
@@ -180,7 +180,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
   .detail-layout { grid-template-columns: 1fr; }
 }
 
-/* ─── Player ────────────────────────────────────────────────────────────────── */
+/* Player */
 .player-col {}
 #yt-player-wrapper {
   background: #000;
@@ -202,7 +202,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
   padding: 0.3rem 0.8rem; border-radius: var(--radius); cursor: pointer;
 }
 
-/* ─── Clips column ──────────────────────────────────────────────────────────── */
+/* Clips column */
 .clips-col {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -245,7 +245,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
 .clip-meta   { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
 .clip-actions { display: flex; gap: 0.4rem; }
 
-/* ─── Buttons ────────────────────────────────────────────────────────────────── */
+/* Buttons */
 .btn {
   padding: 0.3rem 0.8rem; border-radius: var(--radius); border: none;
   cursor: pointer; font-size: 0.82rem; font-weight: 600;
@@ -260,15 +260,15 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
 .btn-find:hover { background: #7b65f0; color: #fff; }
 .btn-find:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* ─── HTMX indicator ─────────────────────────────────────────────────────────── */
+/* HTMX indicator */
 .htmx-indicator { display: none; font-size: 1rem; }
 .htmx-request .htmx-indicator { display: inline; }
 .htmx-request.htmx-indicator { display: inline; }
 
-/* ─── Candidates header ───────────────────────────────────────────────────────── */
+/* Candidates header */
 .candidates-header { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); }
 
-/* ─── Finding overlay ─────────────────────────────────────────────────────────── */
+/* Finding overlay */
 .finding-overlay {
   display: flex; flex-direction: column; align-items: center;
   justify-content: center; gap: 0.75rem;
@@ -278,7 +278,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 .find-error { padding: 0.75rem; color: var(--red, #e05c5c); font-size: 0.85rem; }
 
-/* ─── Progress bar ───────────────────────────────────────────────────────────── */
+/* Progress bar */
 .progress-bar-wrap {
   width: 80%; max-width: 320px; height: 6px;
   background: var(--border); border-radius: 3px; overflow: hidden;
@@ -288,7 +288,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
   border-radius: 3px; transition: width 0.4s ease;
 }
 
-/* ─── Transcript ─────────────────────────────────────────────────────────────── */
+/* Transcript */
 .transcript-tab { overflow-y: auto; max-height: 60vh; }
 .transcript-list { display: flex; flex-direction: column; gap: 0; }
 .transcript-line {
@@ -300,7 +300,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
 .transcript-ts { flex-shrink: 0; font-size: 0.75rem; }
 .transcript-text { color: var(--text); line-height: 1.4; }
 
-/* ─── Clip inline transcript ─────────────────────────────────────────────────── */
+/* Clip inline transcript */
 .clip-transcript { margin-bottom: 0.5rem; }
 .clip-transcript summary {
   font-size: 0.78rem; color: var(--text-muted); cursor: pointer; user-select: none;
@@ -309,7 +309,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
 .clip-transcript summary:hover { color: var(--accent); }
 .clip-transcript-body { margin-top: 0.3rem; }
 
-/* ─── Manual add ─────────────────────────────────────────────────────────────── */
+/* Manual add */
 .manual-add { border-top: 1px solid var(--border); padding: 0.75rem; }
 .manual-add summary { cursor: pointer; font-size: 0.85rem; color: var(--text-muted); }
 .manual-form {
@@ -324,11 +324,11 @@ main { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
   font-size: 0.88rem;
 }
 
-/* ─── Alert ─────────────────────────────────────────────────────────────────── */
+/* Alert */
 .alert {
   padding: 0.75rem 1rem; border-radius: var(--radius); margin-bottom: 1rem;
 }
 .alert-error { background: #e05c5c22; border: 1px solid #e05c5c55; color: #e05c5c; }
 
-/* ─── Misc ───────────────────────────────────────────────────────────────────── */
+/* Misc */
 .empty-message { color: var(--text-muted); font-size: 0.9rem; padding: 1rem 0; text-align: center; }

@@ -148,7 +148,7 @@ class PipelineOrchestrator:
         await self._job_repo.save(job)
         return job
 
-    # ── Helpers ──────────────────────────────────────────────────────────────
+    # Helpers
 
     async def _ensure_data_dir(self, job: Job) -> None:
         if job.data_dir is None:

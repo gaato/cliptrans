@@ -104,7 +104,7 @@ class Job(BaseModel):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
-# ── Clip Finder domain models ─────────────────────────────────────────────────
+# Clip finder domain models
 
 
 class ChannelInfo(BaseModel):

@@ -83,7 +83,7 @@ class MockHolodex:
         raise HolodexError(f"Stream {video_id!r} not found in mock")
 
 
-# ── Live server ────────────────────────────────────────────────────────────────
+# Live server
 
 
 def _get_free_port() -> int:
@@ -150,7 +150,7 @@ def live_server_url(e2e_db_file: Path, e2e_db_url: str) -> Generator[str]:
     thread.join(timeout=5)
 
 
-# ── DB seeding ────────────────────────────────────────────────────────────────
+# DB seeding
 
 
 @pytest.fixture()

@@ -1,4 +1,4 @@
-/* ── YouTube IFrame API ─────────────────────────────────────────────────── */
+/* YouTube IFrame API */
 
 var ytPlayer = null;
 
@@ -33,7 +33,7 @@ function seekTo(seconds) {
   ytPlayer.playVideo();
 }
 
-/* ── Init ─────────────────────────────────────────────────────────────── */
+/* Init */
 document.addEventListener("DOMContentLoaded", function () {
   loadYTApi();
 });

@@ -19,7 +19,7 @@ from e2e.fixtures import TEST_VIDEO_ID
 pytestmark = pytest.mark.e2e
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# Helpers
 
 
 def _goto_selections(page: Page, live_server_url: str) -> None:
@@ -27,7 +27,7 @@ def _goto_selections(page: Page, live_server_url: str) -> None:
     page.wait_for_load_state("networkidle")
 
 
-# ── Basic page load ───────────────────────────────────────────────────────────
+# Basic page load
 
 
 def test_selections_page_title(page: Page, live_server_url: str) -> None:
@@ -50,7 +50,7 @@ def test_empty_state_message_when_no_data(page: Page, live_server_url: str) -> N
     expect(page.locator(".empty-message")).to_contain_text("No selections yet")
 
 
-# ── Cards with data ───────────────────────────────────────────────────────────
+# Cards with data
 
 
 def test_selection_card_renders(page: Page, live_server_url: str, seeded_clips: dict) -> None:
@@ -97,7 +97,7 @@ def test_selection_card_stream_link(page: Page, live_server_url: str, seeded_cli
     expect(link).to_contain_text(TEST_VIDEO_ID)
 
 
-# ── Reject button ─────────────────────────────────────────────────────────────
+# Reject button
 
 
 def test_reject_button_visible(page: Page, live_server_url: str, seeded_clips: dict) -> None:
@@ -149,7 +149,7 @@ def test_reject_changes_card_status(page: Page, live_server_url: str, seeded_cli
     assert responses[0][1] == 200, f"Expected 200, got {responses[0][1]}"
 
 
-# ── Delete button ─────────────────────────────────────────────────────────────
+# Delete button
 
 
 def test_delete_button_visible(page: Page, live_server_url: str, seeded_clips: dict) -> None:
@@ -218,7 +218,7 @@ def test_delete_confirmed_sends_delete_request(
     assert deleted_responses[0][1] == 204, f"Expected 204 No Content, got {deleted_responses[0][1]}"
 
 
-# ── Navigation ────────────────────────────────────────────────────────────────
+# Navigation
 
 
 def test_nav_stream_link_goes_to_home(page: Page, live_server_url: str, seeded_clips: dict) -> None:

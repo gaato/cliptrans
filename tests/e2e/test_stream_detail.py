@@ -30,7 +30,7 @@ pytestmark = pytest.mark.e2e
 _DETAIL_PATH = f"/stream/{TEST_VIDEO_ID}"
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# Helpers
 
 
 def _open_detail(page: Page, live_server_url: str) -> None:
@@ -39,7 +39,7 @@ def _open_detail(page: Page, live_server_url: str) -> None:
     page.wait_for_timeout(800)  # allow Alpine.js to initialise
 
 
-# ── Page header ───────────────────────────────────────────────────────────────
+# Page header
 
 
 def test_detail_page_title(page: Page, live_server_url: str, seeded_clips: dict) -> None:
@@ -78,7 +78,7 @@ def test_detail_seek_input_and_button(page: Page, live_server_url: str, seeded_c
     expect(page.get_by_role("button", name="▶ Seek")).to_be_visible()
 
 
-# ── Candidate tab (default) ───────────────────────────────────────────────────
+# Candidate tab (default)
 
 
 def test_candidates_tab_is_active_by_default(
@@ -143,7 +143,7 @@ def test_candidate_tab_count_label(page: Page, live_server_url: str, seeded_clip
     expect(tab_btn).to_contain_text("Candidates (3)")
 
 
-# ── AI find button ────────────────────────────────────────────────────────────
+# AI find button
 
 
 def test_ai_find_button_present_and_enabled(
@@ -157,7 +157,7 @@ def test_ai_find_button_present_and_enabled(
     expect(btn).to_contain_text("Find clip candidates with AI")
 
 
-# ── Approve button ────────────────────────────────────────────────────────────
+# Approve button
 
 
 def test_approve_button_visible(page: Page, live_server_url: str, seeded_clips: dict) -> None:
@@ -194,7 +194,7 @@ def test_approve_button_sends_post(page: Page, live_server_url: str, seeded_clip
     assert any(p.get("candidate_id") == first_cid for p in posted)
 
 
-# ── Selections tab ────────────────────────────────────────────────────────────
+# Selections tab
 
 
 def test_selections_tab_switch(page: Page, live_server_url: str, seeded_clips: dict) -> None:
@@ -231,7 +231,7 @@ def test_selection_card_has_reject_button(
     expect(reject_btn).to_contain_text("Reject")
 
 
-# ── Transcript tab ────────────────────────────────────────────────────────────
+# Transcript tab
 
 
 def test_transcript_tab_fires_htmx_request(
@@ -284,7 +284,7 @@ def test_transcript_tab_only_fires_once(
     )
 
 
-# ── Clip transcript details ───────────────────────────────────────────────────
+# Clip transcript details
 
 
 def test_candidate_transcript_details_fires_htmx(
@@ -311,7 +311,7 @@ def test_candidate_transcript_details_fires_htmx(
     )
 
 
-# ── Manual clip form ──────────────────────────────────────────────────────────
+# Manual clip form
 
 
 def test_manual_form_opens_on_details_click(
