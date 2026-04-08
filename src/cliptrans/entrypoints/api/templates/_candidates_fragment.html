@@ -16,7 +16,7 @@
       <span class="badge badge-{{ c.category }}">{{ c.category }}</span>
       <span class="badge">conf {{ '%.0f'|format(c.confidence * 100) }}%</span>
       {% if c.chat_intensity is not none and c.chat_intensity > 0.5 %}
-      <span class="badge badge-chat" title="チャット盛り上がり指数">💬 {{ '%.1f'|format(c.chat_intensity) }}x</span>
+      <span class="badge badge-chat" title="Chat intensity">💬 {{ '%.1f'|format(c.chat_intensity) }}x</span>
       {% endif %}
     </div>
     <details class="clip-transcript">
@@ -25,7 +25,7 @@
         hx-target="#tr-{{ c.id }}"
         hx-swap="innerHTML"
         hx-trigger="click once"
-      >文字起こし</summary>
+      >Transcript</summary>
       <div id="tr-{{ c.id }}" class="clip-transcript-body"></div>
     </details>
     <div class="clip-actions">
@@ -35,10 +35,10 @@
         hx-target="#cand-{{ c.id }}"
         hx-swap="outerHTML"
         class="btn btn-approve"
-      >✔ 採用</button>
+      >✔ Approve</button>
     </div>
   </div>
   {% endfor %}
 {% else %}
-  <p class="empty-message">候補が見つかりませんでした。</p>
+  <p class="empty-message">No candidates found.</p>
 {% endif %}

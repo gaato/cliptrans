@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}確定済みクリップ — ClipTrans{% endblock %}
+{% block title %}Selections — ClipTrans{% endblock %}
 {% block content %}
 <section class="page-header">
-  <h1>確定済みクリップ</h1>
+  <h1>Selections</h1>
 </section>
 
 <section class="clip-list">
@@ -27,19 +27,19 @@
           hx-target="#sel-{{ s.id }}"
           hx-swap="outerHTML"
           class="btn btn-reject"
-        >✘ 却下</button>
+        >✘ Reject</button>
         <button
           hx-delete="/api/clips/selections/{{ s.id }}"
           hx-target="#sel-{{ s.id }}"
           hx-swap="outerHTML"
-          hx-confirm="本当に削除しますか？"
+          hx-confirm="Delete this selection?"
           class="btn btn-danger"
-        >🗑 削除</button>
+        >🗑 Delete</button>
       </div>
     </div>
     {% endfor %}
   {% else %}
-    <p class="empty-message">確定済みクリップがありません。</p>
+    <p class="empty-message">No selections yet.</p>
   {% endif %}
 </section>
 {% endblock %}

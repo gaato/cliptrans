@@ -3,13 +3,13 @@
 Covers
 ------
 * Page header (title, channel, duration)
-* Default tab is 候補 (Candidates)
+* Default tab is Candidates
 * Candidate cards show time buttons, title, reason, category badge, conf badge
-* Tab switching to 確定 (Selections) and 文字起こし (Transcript)
+* Tab switching to Selections and Transcript
 * Transcript tab fires an HTMX GET request to /htmx/transcript/<video_id>
-* 「🤖 AI でクリップ候補を探す」 button visible and enabled
-* 「✔ 採用」 (Approve) HTMX POST is sent with the correct candidate_id
-* 「✘ 却下」 (Reject) button is visible in the selections tab
+* "🤖 Find clip candidates with AI" button visible and enabled
+* "✔ Approve" HTMX POST is sent with the correct candidate_id
+* "✘ Reject" button is visible in the selections tab
 * Manual clip form (``<details>``) opens and has the expected fields
 * Time buttons (seekTo) carry correct timestamps
 """
@@ -84,7 +84,7 @@ def test_detail_seek_input_and_button(page: Page, live_server_url: str, seeded_c
 def test_candidates_tab_is_active_by_default(
     page: Page, live_server_url: str, seeded_clips: dict
 ) -> None:
-    """The 候補 tab button has the 'active' class on first load."""
+    """The Candidates tab button has the 'active' class on first load."""
     _open_detail(page, live_server_url)
     candidates_tab = page.locator(".tab-bar button").nth(0)
     assert "active" in (candidates_tab.get_attribute("class") or "")
@@ -137,10 +137,10 @@ def test_candidate_card_shows_confidence_badge(
 
 
 def test_candidate_tab_count_label(page: Page, live_server_url: str, seeded_clips: dict) -> None:
-    """The 候補 tab button label shows the count of candidates."""
+    """The Candidates tab button label shows the count of candidates."""
     _open_detail(page, live_server_url)
     tab_btn = page.locator(".tab-bar button").nth(0)
-    expect(tab_btn).to_contain_text("候補 (3)")
+    expect(tab_btn).to_contain_text("Candidates (3)")
 
 
 # ── AI find button ────────────────────────────────────────────────────────────
@@ -149,26 +149,26 @@ def test_candidate_tab_count_label(page: Page, live_server_url: str, seeded_clip
 def test_ai_find_button_present_and_enabled(
     page: Page, live_server_url: str, seeded_clips: dict
 ) -> None:
-    """The '🤖 AI でクリップ候補を探す' button is visible and enabled."""
+    """The '🤖 Find clip candidates with AI' button is visible and enabled."""
     _open_detail(page, live_server_url)
     btn = page.locator("#find-btn")
     expect(btn).to_be_visible()
     expect(btn).to_be_enabled()
-    expect(btn).to_contain_text("AI でクリップ候補を探す")
+    expect(btn).to_contain_text("Find clip candidates with AI")
 
 
-# ── Approve (採用) button ─────────────────────────────────────────────────────
+# ── Approve button ────────────────────────────────────────────────────────────
 
 
 def test_approve_button_visible(page: Page, live_server_url: str, seeded_clips: dict) -> None:
-    """Each candidate card has a '✔ 採用' button."""
+    """Each candidate card has a '✔ Approve' button."""
     _open_detail(page, live_server_url)
     approve_btns = page.locator("#candidates-list .btn-approve")
     expect(approve_btns).to_have_count(3)
 
 
 def test_approve_button_sends_post(page: Page, live_server_url: str, seeded_clips: dict) -> None:
-    """Clicking '✔ 採用' sends an HTMX POST to /api/clips/approve.
+    """Clicking '✔ Approve' sends an HTMX POST to /api/clips/approve.
 
     We capture the outgoing request and verify the JSON body contains the
     correct ``candidate_id``.
@@ -198,7 +198,7 @@ def test_approve_button_sends_post(page: Page, live_server_url: str, seeded_clip
 
 
 def test_selections_tab_switch(page: Page, live_server_url: str, seeded_clips: dict) -> None:
-    """Clicking 確定 tab shows the selection cards and hides candidate cards."""
+    """Clicking Selections tab shows the selection cards and hides candidate cards."""
     _open_detail(page, live_server_url)
     page.locator(".tab-bar button").nth(1).click()
     page.wait_for_timeout(300)
@@ -213,22 +213,22 @@ def test_selections_tab_switch(page: Page, live_server_url: str, seeded_clips: d
 
 
 def test_selections_tab_count_label(page: Page, live_server_url: str, seeded_clips: dict) -> None:
-    """The 確定 tab button shows the count of selections."""
+    """The Selections tab button shows the count of selections."""
     _open_detail(page, live_server_url)
     tab_btn = page.locator(".tab-bar button").nth(1)
-    expect(tab_btn).to_contain_text("確定 (1)")
+    expect(tab_btn).to_contain_text("Selections (1)")
 
 
 def test_selection_card_has_reject_button(
     page: Page, live_server_url: str, seeded_clips: dict
 ) -> None:
-    """Selection cards have a '✘ 却下' button."""
+    """Selection cards have a '✘ Reject' button."""
     _open_detail(page, live_server_url)
     page.locator(".tab-bar button").nth(1).click()
     page.wait_for_timeout(300)
     reject_btn = page.locator(".clip-list").nth(1).locator(".btn-reject")
     expect(reject_btn).to_be_visible()
-    expect(reject_btn).to_contain_text("却下")
+    expect(reject_btn).to_contain_text("Reject")
 
 
 # ── Transcript tab ────────────────────────────────────────────────────────────
@@ -237,7 +237,7 @@ def test_selection_card_has_reject_button(
 def test_transcript_tab_fires_htmx_request(
     page: Page, live_server_url: str, seeded_clips: dict
 ) -> None:
-    """Clicking 文字起こし tab triggers a GET to /htmx/transcript/<video_id>."""
+    """Clicking Transcript tab triggers a GET to /htmx/transcript/<video_id>."""
     _open_detail(page, live_server_url)
 
     htmx_requests: list[str] = []
@@ -290,7 +290,7 @@ def test_transcript_tab_only_fires_once(
 def test_candidate_transcript_details_fires_htmx(
     page: Page, live_server_url: str, seeded_clips: dict
 ) -> None:
-    """Opening the '文字起こし' <details> inside a candidate card fires HTMX."""
+    """Opening the Transcript <details> inside a candidate card fires HTMX."""
     _open_detail(page, live_server_url)
 
     htmx_requests: list[str] = []
@@ -317,7 +317,7 @@ def test_candidate_transcript_details_fires_htmx(
 def test_manual_form_opens_on_details_click(
     page: Page, live_server_url: str, seeded_clips: dict
 ) -> None:
-    """Clicking '手動でクリップを追加' expands the form."""
+    """Clicking 'Add a clip manually' expands the form."""
     _open_detail(page, live_server_url)
     page.locator("details.manual-add summary").click()
     page.wait_for_timeout(200)

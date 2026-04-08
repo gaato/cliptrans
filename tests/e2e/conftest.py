@@ -112,7 +112,7 @@ def e2e_db_file(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
 @pytest.fixture(scope="session")
 def e2e_db_url(e2e_db_file: Path) -> str:
-    return e2e_db_file.resolve().as_uri().replace("file:", "sqlite+aiosqlite:", 1)
+    return f"sqlite+aiosqlite:///{e2e_db_file.resolve()}"
 
 
 @pytest.fixture(scope="session")

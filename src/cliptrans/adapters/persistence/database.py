@@ -7,36 +7,33 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from urllib.parse import urlparse
 
-from sqlalchemy.ext.asyncio import (
-    AsyncEngine,
-    AsyncSession,
-    async_sessionmaker,
-    create_async_engine,
-)
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
 from cliptrans.adapters.persistence.tables import Base
 
-_engine: AsyncEngine | None = None
-_session_factory: async_sessionmaker[AsyncSession] | None = None
+_engines: dict[str, AsyncEngine] = {}
+_session_factories: dict[str, async_sessionmaker[AsyncSession]] = {}
 
 
 def get_engine(database_url: str) -> AsyncEngine:
-    global _engine
-    if _engine is None:
-        _engine = create_async_engine(
+    engine = _engines.get(database_url)
+    if engine is None:
+        engine = create_async_engine(
             database_url,
             echo=False,
             future=True,
         )
-    return _engine
+        _engines[database_url] = engine
+    return engine
 
 
 def get_session_factory(database_url: str) -> async_sessionmaker[AsyncSession]:
-    global _session_factory
-    if _session_factory is None:
+    factory = _session_factories.get(database_url)
+    if factory is None:
         engine = get_engine(database_url)
-        _session_factory = async_sessionmaker(engine, expire_on_commit=False)
-    return _session_factory
+        factory = async_sessionmaker(engine, expire_on_commit=False)
+        _session_factories[database_url] = factory
+    return factory
 
 
 async def create_tables(database_url: str) -> None:

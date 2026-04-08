@@ -2,7 +2,7 @@
 {% block title %}Streams — ClipTrans{% endblock %}
 {% block content %}
 <section class="page-header">
-  <h1>配信一覧</h1>
+  <h1>Streams</h1>
   <form method="get" action="/" class="filter-form" id="stream-filter">
 
     <!-- Channel search (autocomplete) -->
@@ -11,7 +11,7 @@
       class="channel-search-wrap"
     >
       <label>
-        チャンネル
+        Channel
         <div class="channel-input-row">
           <div class="channel-selected" x-show="selectedId" x-cloak>
             <img :src="selectedPhoto" class="channel-avatar" x-show="selectedPhoto" />
@@ -24,7 +24,7 @@
             x-model="query"
             @input.debounce.300="search()"
             @keydown.escape="suggestions = []"
-            placeholder="キアラ / Kobo …"
+            placeholder="Kiara / Kobo ..."
             autocomplete="off"
             class="channel-text-input"
           />
@@ -64,7 +64,7 @@
       </select>
     </label>
 
-    <button type="submit" class="filter-submit">検索</button>
+    <button type="submit" class="filter-submit">Search</button>
   </form>
 </section>
 
@@ -97,8 +97,8 @@
     {% endfor %}
   {% else %}
     <p class="empty-message">
-      配信が見つかりませんでした。<br/>
-      {% if not channel_id %}CLIPTRANS_HOLODEX_API_KEY が設定されているか確認してください。{% endif %}
+      No streams found.<br/>
+      {% if not channel_id %}Check whether `CLIPTRANS_HOLODEX_API_KEY` is configured.{% endif %}
     </p>
   {% endif %}
 </section>

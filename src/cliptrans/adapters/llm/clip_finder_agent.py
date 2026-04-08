@@ -37,12 +37,13 @@ def _srt_to_seconds(ts: str) -> float:
     raise ValueError(f"Invalid SRT timestamp: {ts}")
 
 
-_SYSTEM_PROMPT = """\
+def _build_system_prompt(output_language: str) -> str:
+    return f"""\
 You are an expert video clip curator. Given a transcript (SRT format) of a live stream,
 identify the most interesting moments worth clipping. For each candidate:
 - start_time / end_time: use exact SRT timestamps from the transcript
-- title: short clip title in Japanese (under 25 chars)
-- reason: one sentence in Japanese explaining why it is interesting
+- title: short clip title in the user's language ({output_language}) under 25 characters
+- reason: one sentence in the user's language ({output_language}) explaining why it is interesting
 - category: one of "funny", "emotional", "collab", "music", "controversy", "highlight"
 - confidence: 0.0–1.0
 
@@ -60,9 +61,9 @@ class ClipFinderAgent:
         self._provider = provider
         self._model = model
         self._api_key = api_key
-        self._agent: Agent[None, _FindResult] | None = None
+        self._agents: dict[str, Agent[None, _FindResult]] = {}
 
-    def _build_agent(self) -> Agent[None, _FindResult]:
+    def _build_agent(self, output_language: str) -> Agent[None, _FindResult]:
         from cliptrans.adapters.llm.translation_agent import PydanticAITranslator
 
         # Reuse the same _build_model logic from PydanticAITranslator
@@ -71,16 +72,23 @@ class ClipFinderAgent:
         return Agent(  # type: ignore[return-value]  # ty: ignore[invalid-return-type]
             model_obj,
             output_type=_FindResult,
-            system_prompt=_SYSTEM_PROMPT,
+            system_prompt=_build_system_prompt(output_language),
         )
 
     async def find_candidates(
-        self, video_id: str, srt_chunk: str, chunk_offset: float = 0.0
+        self,
+        video_id: str,
+        srt_chunk: str,
+        chunk_offset: float = 0.0,
+        output_language: str = "en",
     ) -> list[ClipCandidate]:
-        if self._agent is None:
-            self._agent = self._build_agent()
+        language = output_language or "en"
+        agent = self._agents.get(language)
+        if agent is None:
+            agent = self._build_agent(language)
+            self._agents[language] = agent
         try:
-            result = await self._agent.run(srt_chunk)
+            result = await agent.run(srt_chunk)
         except Exception as exc:
             raise ClipFinderError(f"LLM clip finding failed: {exc}") from exc
 

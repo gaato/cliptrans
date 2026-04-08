@@ -4,11 +4,12 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from cliptrans.domain.models import ClipCandidate, ClipSelection
 from cliptrans.entrypoints.api.deps import ClipFinder, ClipManager, ClipRepo
+from cliptrans.entrypoints.api.i18n import preferred_language
 
 router = APIRouter()
 
@@ -31,8 +32,12 @@ class FindRequest(BaseModel):
 
 
 @router.post("/find", response_model=list[ClipCandidate])
-async def find_candidates(body: FindRequest, finder: ClipFinder, repo: ClipRepo):
-    candidates = await finder.find_candidates(body.video_id)
+async def find_candidates(
+    request: Request, body: FindRequest, finder: ClipFinder, repo: ClipRepo
+):
+    candidates = await finder.find_candidates(
+        body.video_id, output_language=preferred_language(request)
+    )
     await repo.save_candidates(candidates)
     return candidates
 

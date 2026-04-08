@@ -5,8 +5,8 @@ Covers
 * Page title
 * Selection cards rendered from DB
 * Each card shows stream link, timestamps, title, status badge
-* 「✘ 却下」(Reject) sends HTMX POST and the card is replaced
-* 「🗑 削除」(Delete) prompts for confirmation, then sends HTMX DELETE
+* "✘ Reject" sends HTMX POST and the card is replaced
+* "🗑 Delete" prompts for confirmation, then sends HTMX DELETE
 """
 
 from __future__ import annotations
@@ -33,13 +33,13 @@ def _goto_selections(page: Page, live_server_url: str) -> None:
 def test_selections_page_title(page: Page, live_server_url: str) -> None:
     """The selections page has the expected <title>."""
     _goto_selections(page, live_server_url)
-    expect(page).to_have_title("確定済みクリップ — ClipTrans")
+    expect(page).to_have_title("Selections — ClipTrans")
 
 
 def test_selections_page_heading(page: Page, live_server_url: str) -> None:
-    """The page has a <h1> with '確定済みクリップ'."""
+    """The page has a <h1> with 'Selections'."""
     _goto_selections(page, live_server_url)
-    expect(page.locator("h1")).to_have_text("確定済みクリップ")
+    expect(page.locator("h1")).to_have_text("Selections")
 
 
 def test_empty_state_message_when_no_data(page: Page, live_server_url: str) -> None:
@@ -47,7 +47,7 @@ def test_empty_state_message_when_no_data(page: Page, live_server_url: str) -> N
     # No seeded_clips fixture → DB is empty for selections
     _goto_selections(page, live_server_url)
     expect(page.locator(".empty-message")).to_be_visible()
-    expect(page.locator(".empty-message")).to_contain_text("確定済みクリップがありません")
+    expect(page.locator(".empty-message")).to_contain_text("No selections yet")
 
 
 # ── Cards with data ───────────────────────────────────────────────────────────
@@ -101,14 +101,14 @@ def test_selection_card_stream_link(page: Page, live_server_url: str, seeded_cli
 
 
 def test_reject_button_visible(page: Page, live_server_url: str, seeded_clips: dict) -> None:
-    """Each selection card has a '✘ 却下' button."""
+    """Each selection card has a '✘ Reject' button."""
     _goto_selections(page, live_server_url)
     expect(page.locator(".btn-reject")).to_be_visible()
-    expect(page.locator(".btn-reject")).to_contain_text("却下")
+    expect(page.locator(".btn-reject")).to_contain_text("Reject")
 
 
 def test_reject_button_sends_post(page: Page, live_server_url: str, seeded_clips: dict) -> None:
-    """Clicking '✘ 却下' sends an HTMX POST to /api/clips/selections/<id>/reject."""
+    """Clicking '✘ Reject' sends an HTMX POST to /api/clips/selections/<id>/reject."""
     _goto_selections(page, live_server_url)
 
     card = page.locator(".clip-card").first
@@ -153,16 +153,16 @@ def test_reject_changes_card_status(page: Page, live_server_url: str, seeded_cli
 
 
 def test_delete_button_visible(page: Page, live_server_url: str, seeded_clips: dict) -> None:
-    """Each selection card has a '🗑 削除' button."""
+    """Each selection card has a '🗑 Delete' button."""
     _goto_selections(page, live_server_url)
     expect(page.locator(".btn-danger")).to_be_visible()
-    expect(page.locator(".btn-danger")).to_contain_text("削除")
+    expect(page.locator(".btn-danger")).to_contain_text("Delete")
 
 
 def test_delete_button_shows_confirm_dialog(
     page: Page, live_server_url: str, seeded_clips: dict
 ) -> None:
-    """Clicking '🗑 削除' shows an HTMX confirm dialog."""
+    """Clicking '🗑 Delete' shows an HTMX confirm dialog."""
     _goto_selections(page, live_server_url)
 
     # htmx uses a window.confirm() dialog when hx-confirm is set
@@ -178,7 +178,7 @@ def test_delete_button_shows_confirm_dialog(
     page.wait_for_timeout(400)
 
     assert dialog_texts, "Expected a confirm dialog but none appeared"
-    assert "削除" in dialog_texts[0] or "本当に" in dialog_texts[0]
+    assert "Delete" in dialog_texts[0]
 
 
 def test_delete_confirmed_sends_delete_request(

@@ -17,6 +17,7 @@ from cliptrans.entrypoints.api.deps import (
     StreamBrowser,
     SubtitleFetcher,
 )
+from cliptrans.entrypoints.api.i18n import preferred_language
 
 router = APIRouter()
 
@@ -95,14 +96,16 @@ async def find_candidates_html(
     try:
         if replace:
             await repo.delete_candidates(video_id)
-        candidates = await finder.find_candidates(video_id)
+        candidates = await finder.find_candidates(
+            video_id, output_language=preferred_language(request)
+        )
         await repo.save_candidates(candidates)
     except Exception as exc:
         import traceback
 
         error_msg = str(exc) or traceback.format_exc().splitlines()[-1]
         return HTMLResponse(
-            f'<p class="empty-message" style="color:var(--red)">エラー: {error_msg}</p>',
+            f'<p class="empty-message" style="color:var(--red)">Error: {error_msg}</p>',
             status_code=500,
         )
     return _templates.TemplateResponse(
@@ -123,7 +126,9 @@ async def find_candidates_sse(
     async def event_stream():
         if replace:
             await repo.delete_candidates(video_id)
-        async for event in finder.find_candidates_stream(video_id):
+        async for event in finder.find_candidates_stream(
+            video_id, output_language=preferred_language(request)
+        ):
             if await request.is_disconnected():
                 break
             if event["type"] == "done":
@@ -196,7 +201,7 @@ async def transcript_html(
             lines = [line for line in lines if line["start_sec"] < end]
     except Exception as exc:
         return HTMLResponse(
-            f'<p class="empty-message" style="color:var(--red)">エラー: {exc}</p>',
+            f'<p class="empty-message" style="color:var(--red)">Error: {exc}</p>',
             status_code=500,
         )
     return _templates.TemplateResponse(

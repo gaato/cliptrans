@@ -94,7 +94,9 @@ class ClipFinderService:
         self._overlap_seconds = overlap_minutes * 60
         self._max_candidates = max_candidates
 
-    async def find_candidates(self, video_id: str) -> list[ClipCandidate]:
+    async def find_candidates(
+        self, video_id: str, output_language: str = "en"
+    ) -> list[ClipCandidate]:
         import asyncio
 
         from cliptrans.application.services.chat_analyzer import ChatAnalyzerService
@@ -130,7 +132,12 @@ class ClipFinderService:
         chunks = _chunk_srt(srt_text, self._chunk_seconds, self._overlap_seconds)
         all_candidates: list[ClipCandidate] = []
         for offset, chunk in chunks:
-            candidates = await self._agent.find_candidates(video_id, chunk, chunk_offset=offset)
+            candidates = await self._agent.find_candidates(
+                video_id,
+                chunk,
+                chunk_offset=offset,
+                output_language=output_language,
+            )
             all_candidates.extend(candidates)
 
         # Attach chat intensity and sort by combined score
@@ -146,7 +153,7 @@ class ClipFinderService:
         all_candidates.sort(key=_score, reverse=True)
         return all_candidates[: self._max_candidates]
 
-    async def find_candidates_stream(self, video_id: str):
+    async def find_candidates_stream(self, video_id: str, output_language: str = "en"):
         """Async generator yielding SSE-style dicts during processing.
 
         Yields dicts with keys:
@@ -159,7 +166,7 @@ class ClipFinderService:
         from cliptrans.application.services.chat_analyzer import ChatAnalyzerService
 
         try:
-            yield {"type": "progress", "step": 0, "total": 1, "message": "字幕とチャットを取得中…"}
+            yield {"type": "progress", "step": 0, "total": 1, "message": "Loading subtitles and chat..."}
 
             subtitle_task = asyncio.create_task(self._fetcher.fetch_srt(video_id))
             live_chat_task = (
@@ -184,7 +191,7 @@ class ClipFinderService:
                     )
 
             if not srt_text.strip():
-                yield {"type": "error_event", "message": "字幕データが見つかりませんでした。"}
+                yield {"type": "error_event", "message": "No subtitle data was found."}
                 return
 
             chunks = _chunk_srt(srt_text, self._chunk_seconds, self._overlap_seconds)
@@ -197,9 +204,14 @@ class ClipFinderService:
                     "type": "progress",
                     "step": i,
                     "total": total,
-                    "message": f"チャンク {i}/{total} を解析中… ({start_min}分〜)",
+                    "message": f"Analyzing chunk {i}/{total}... ({start_min}m+)",
                 }
-                candidates = await self._agent.find_candidates(video_id, chunk, chunk_offset=offset)
+                candidates = await self._agent.find_candidates(
+                    video_id,
+                    chunk,
+                    chunk_offset=offset,
+                    output_language=output_language,
+                )
                 all_candidates.extend(candidates)
 
             for c in all_candidates:

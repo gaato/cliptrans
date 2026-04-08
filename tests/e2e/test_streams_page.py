@@ -95,17 +95,17 @@ def test_stream_card_links_to_detail(page: Page, live_server_url: str) -> None:
 def test_filter_form_elements_visible(page: Page, live_server_url: str) -> None:
     """Channel input, org input, status select, and submit button are visible."""
     _goto(page, live_server_url)
-    expect(page.get_by_placeholder("キアラ / Kobo …")).to_be_visible()
+    expect(page.get_by_placeholder("Kiara / Kobo ...")).to_be_visible()
     expect(page.get_by_placeholder("Hololive …")).to_be_visible()
     expect(page.get_by_role("combobox", name="Status")).to_be_visible()
-    expect(page.get_by_role("button", name="検索")).to_be_visible()
+    expect(page.get_by_role("button", name="Search")).to_be_visible()
 
 
 def test_org_filter_appends_to_url(page: Page, live_server_url: str) -> None:
     """Typing an org and submitting updates the URL with ?org=."""
     _goto(page, live_server_url)
     page.get_by_placeholder("Hololive …").fill("Hololive")
-    page.get_by_role("button", name="検索").click()
+    page.get_by_role("button", name="Search").click()
     page.wait_for_load_state("networkidle")
     assert "org=Hololive" in page.url
 
@@ -114,7 +114,7 @@ def test_status_live_filter(page: Page, live_server_url: str) -> None:
     """Selecting 'Live' status and submitting adds ?status=live to the URL."""
     _goto(page, live_server_url)
     page.get_by_role("combobox", name="Status").select_option("live")
-    page.get_by_role("button", name="検索").click()
+    page.get_by_role("button", name="Search").click()
     page.wait_for_load_state("networkidle")
     assert "status=live" in page.url
 
@@ -142,7 +142,7 @@ def test_status_defaults_to_past(page: Page, live_server_url: str) -> None:
 def test_channel_autocomplete_appears_on_partial_input(page: Page, live_server_url: str) -> None:
     """Typing a partial name ('kiar') shows the suggestion dropdown."""
     _goto(page, live_server_url)
-    inp = page.get_by_placeholder("キアラ / Kobo …")
+    inp = page.get_by_placeholder("Kiara / Kobo ...")
     inp.click()
     inp.type("kiar", delay=50)
     # Wait for Alpine debounce (300 ms) + fetch + DOM update
@@ -155,7 +155,7 @@ def test_channel_autocomplete_appears_on_partial_input(page: Page, live_server_u
 def test_channel_autocomplete_full_name(page: Page, live_server_url: str) -> None:
     """Typing the full name 'takanashi kiara' shows the suggestion."""
     _goto(page, live_server_url)
-    inp = page.get_by_placeholder("キアラ / Kobo …")
+    inp = page.get_by_placeholder("Kiara / Kobo ...")
     inp.click()
     # Type one character at a time to trigger debounce correctly
     inp.type("takanashi kiara", delay=50)
@@ -169,7 +169,7 @@ def test_channel_autocomplete_no_results_for_unknown_query(
 ) -> None:
     """An unknown query returns no suggestions; the dropdown stays hidden."""
     _goto(page, live_server_url)
-    inp = page.get_by_placeholder("キアラ / Kobo …")
+    inp = page.get_by_placeholder("Kiara / Kobo ...")
     inp.click()
     inp.type("zzzzxxx", delay=50)
     page.wait_for_timeout(600)
@@ -181,7 +181,7 @@ def test_channel_autocomplete_no_results_for_unknown_query(
 def test_channel_autocomplete_select_navigates(page: Page, live_server_url: str) -> None:
     """Selecting a suggestion from the dropdown navigates to /?channel_id=…."""
     _goto(page, live_server_url)
-    inp = page.get_by_placeholder("キアラ / Kobo …")
+    inp = page.get_by_placeholder("Kiara / Kobo ...")
     inp.click()
     inp.type("kiara", delay=50)
     page.wait_for_timeout(600)
@@ -198,7 +198,7 @@ def test_channel_autocomplete_select_navigates(page: Page, live_server_url: str)
 def test_channel_autocomplete_shows_selected_label(page: Page, live_server_url: str) -> None:
     """After selection the text input hides and the selected label appears."""
     _goto(page, live_server_url)
-    inp = page.get_by_placeholder("キアラ / Kobo …")
+    inp = page.get_by_placeholder("Kiara / Kobo ...")
     inp.click()
     inp.type("kiara", delay=50)
     page.wait_for_timeout(600)
@@ -231,14 +231,14 @@ def test_channel_autocomplete_clear_button(page: Page, live_server_url: str) -> 
     page.wait_for_timeout(300)
 
     # The text input should appear again
-    expect(page.get_by_placeholder("キアラ / Kobo …")).to_be_visible()
+    expect(page.get_by_placeholder("Kiara / Kobo ...")).to_be_visible()
     expect(selected).to_be_hidden()
 
 
 def test_channel_autocomplete_escape_clears_suggestions(page: Page, live_server_url: str) -> None:
     """Pressing Escape hides the suggestions without selecting."""
     _goto(page, live_server_url)
-    inp = page.get_by_placeholder("キアラ / Kobo …")
+    inp = page.get_by_placeholder("Kiara / Kobo ...")
     inp.click()
     inp.type("kiara", delay=50)
     page.wait_for_timeout(600)
@@ -285,7 +285,7 @@ def test_channel_autocomplete_via_page_route(page: Page, live_server_url: str) -
     page.route(re.compile(r"/api/streams/channels/suggest"), _intercept)
 
     _goto(page, live_server_url)
-    inp = page.get_by_placeholder("キアラ / Kobo …")
+    inp = page.get_by_placeholder("Kiara / Kobo ...")
     inp.click()
     inp.type("kiara", delay=50)
     page.wait_for_timeout(600)
@@ -302,7 +302,7 @@ def test_channel_autocomplete_api_error_is_silent(page: Page, live_server_url: s
     page.route(re.compile(r"/api/streams/channels/suggest"), _error)
 
     _goto(page, live_server_url)
-    inp = page.get_by_placeholder("キアラ / Kobo …")
+    inp = page.get_by_placeholder("Kiara / Kobo ...")
     inp.click()
     inp.type("kiara", delay=50)
     page.wait_for_timeout(600)
@@ -310,4 +310,4 @@ def test_channel_autocomplete_api_error_is_silent(page: Page, live_server_url: s
     # No suggestions should appear; the page should not crash
     expect(page.locator(".channel-suggestions")).to_be_hidden()
     # The page itself must still be functional
-    expect(page.get_by_role("button", name="検索")).to_be_visible()
+    expect(page.get_by_role("button", name="Search")).to_be_visible()
