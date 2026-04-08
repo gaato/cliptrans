@@ -138,8 +138,6 @@ Configuration precedence is approximately:
 Architecture
 ------------
 
-More detailed architecture and configuration notes are available in the DeepWiki reference above.
-
 .. code-block:: text
 
    CLI / FastAPI
