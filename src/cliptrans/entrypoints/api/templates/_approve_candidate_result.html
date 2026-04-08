@@ -4,6 +4,11 @@
 <div id="clip-feedback" hx-swap-oob="innerHTML">
   <p class="action-feedback action-feedback-success">Approved "{{ selection.title }}" and moved it to Selections.</p>
 </div>
+{% if candidate_count == 0 %}
+<div hx-swap-oob="beforeend:#candidates-list">
+  <p id="candidates-empty" class="empty-message">No candidates left.</p>
+</div>
+{% endif %}
 {% set s = selection %}
 {% set page_kind = "stream" %}
 <div hx-swap-oob="beforeend:#selections-list">

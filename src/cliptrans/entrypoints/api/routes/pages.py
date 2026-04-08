@@ -24,6 +24,13 @@ router = APIRouter()
 _templates = Jinja2Templates(directory=Path(__file__).parent.parent / "templates")
 
 
+def _visible_candidates(
+    candidates, selections
+):
+    selected_candidate_ids = {s.candidate_id for s in selections if s.candidate_id is not None}
+    return [c for c in candidates if c.id not in selected_candidate_ids]
+
+
 @router.get("/", response_class=HTMLResponse)
 async def index(
     request: Request,
@@ -62,8 +69,9 @@ async def stream_detail(request: Request, video_id: str, browser: StreamBrowser,
         error = str(exc)
     else:
         error = None
-    candidates = await repo.get_candidates(video_id) if stream else []
     selections = await repo.get_selections(stream_id=video_id, status="pending") if stream else []
+    candidates = await repo.get_candidates(video_id) if stream else []
+    candidates = _visible_candidates(candidates, selections)
     return _templates.TemplateResponse(
         request=request,
         name="stream_detail.html",
@@ -100,6 +108,8 @@ async def find_candidates_html(
             video_id, output_language=preferred_language(request)
         )
         await repo.save_candidates(candidates)
+        selections = await repo.get_selections(stream_id=video_id, status="pending")
+        candidates = _visible_candidates(candidates, selections)
     except Exception as exc:
         import traceback
 
@@ -137,6 +147,8 @@ async def find_candidates_sse(
 
                 candidates = [ClipCandidate(**c) for c in event["candidates"]]
                 await repo.save_candidates(candidates)
+                selections = await repo.get_selections(stream_id=video_id, status="pending")
+                candidates = _visible_candidates(candidates, selections)
                 html = _templates.get_template("_candidates_fragment.html").render(
                     candidates=candidates, video_id=video_id
                 )

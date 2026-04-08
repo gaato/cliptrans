@@ -20,14 +20,14 @@
     <span class="badge badge-status-{{ s.status }}">{{ s.status }}</span>
   </div>
   <div class="clip-actions">
-    {% if page_kind == "stream" %}
+    {% if s.candidate_id %}
       <button
         hx-delete="/api/clips/selections/{{ s.id }}"
         hx-target="#sel-{{ s.id }}"
         hx-swap="delete"
-        hx-confirm="Remove this selection?"
+        hx-confirm="Return this selection to candidates?"
         class="btn btn-danger"
-      >Remove</button>
+      >Return to Candidates</button>
     {% else %}
       <button
         hx-delete="/api/clips/selections/{{ s.id }}"
@@ -35,7 +35,7 @@
         hx-swap="delete"
         hx-confirm="Delete this selection?"
         class="btn btn-danger"
-      >🗑 Delete</button>
+      >{% if page_kind == "stream" %}Remove{% else %}🗑 Delete{% endif %}</button>
     {% endif %}
   </div>
 </div>

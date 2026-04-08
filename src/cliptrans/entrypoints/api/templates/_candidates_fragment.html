@@ -1,44 +1,7 @@
 {% if candidates %}
   {% for c in candidates %}
-  <div class="clip-card" id="cand-{{ c.id }}">
-    <div class="clip-times">
-      <button class="time-btn" onclick="seekTo({{ c.start }})">
-        {{ '%d:%02d'|format(c.start|int // 60, c.start|int % 60) }}
-      </button>
-      →
-      <button class="time-btn" onclick="seekTo({{ c.end }})">
-        {{ '%d:%02d'|format(c.end|int // 60, c.end|int % 60) }}
-      </button>
-    </div>
-    <p class="clip-title">{{ c.title }}</p>
-    <p class="clip-reason">{{ c.reason }}</p>
-    <div class="clip-meta">
-      <span class="badge badge-{{ c.category }}">{{ c.category }}</span>
-      <span class="badge">conf {{ '%.0f'|format(c.confidence * 100) }}%</span>
-      {% if c.chat_intensity is not none and c.chat_intensity > 0.5 %}
-      <span class="badge badge-chat" title="Chat intensity">💬 {{ '%.1f'|format(c.chat_intensity) }}x</span>
-      {% endif %}
-    </div>
-    <details class="clip-transcript">
-      <summary
-        hx-get="/htmx/transcript/{{ video_id }}?start={{ c.start }}&end={{ c.end }}"
-        hx-target="#tr-{{ c.id }}"
-        hx-swap="innerHTML"
-        hx-trigger="click once"
-      >Transcript</summary>
-      <div id="tr-{{ c.id }}" class="clip-transcript-body"></div>
-    </details>
-    <div class="clip-actions">
-      <button
-        hx-post="/api/clips/approve"
-        hx-vals='{"candidate_id": "{{ c.id }}", "notes": ""}'
-        hx-target="#cand-{{ c.id }}"
-        hx-swap="delete"
-        class="btn btn-approve"
-      >✔ Approve</button>
-    </div>
-  </div>
+    {% include "_candidate_card.html" %}
   {% endfor %}
 {% else %}
-  <p class="empty-message">No candidates found.</p>
+  <p id="candidates-empty" class="empty-message">No candidates found.</p>
 {% endif %}

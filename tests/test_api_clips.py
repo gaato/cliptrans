@@ -90,6 +90,39 @@ def _insert_selection(db_path, *, stream_id: str = "video-123", status: str = "p
     return selection_id
 
 
+def _insert_selection_for_candidate(
+    db_path, *, candidate_id: str, stream_id: str = "video-123"
+) -> str:
+    selection_id = str(uuid4())
+    now = datetime.now(UTC).isoformat()
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    cur.execute(
+        """
+        INSERT INTO clip_selections
+          (id, stream_id, start, end, title, notes, status,
+           job_id, candidate_id, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            selection_id,
+            stream_id,
+            12.5,
+            27.0,
+            "Clip title",
+            "",
+            "pending",
+            None,
+            candidate_id,
+            now,
+            now,
+        ),
+    )
+    conn.commit()
+    conn.close()
+    return selection_id
+
+
 def test_htmx_approve_accepts_form_data_and_creates_selection(client) -> None:
     test_client, db_path = client
     candidate_id = _insert_candidate(db_path)
@@ -116,7 +149,7 @@ def test_htmx_approve_accepts_form_data_and_creates_selection(client) -> None:
     conn.close()
 
     assert saved_rows == [(candidate_id, "video-123")]
-    assert remaining_candidates == (0,)
+    assert remaining_candidates == (1,)
 
 
 def test_htmx_create_returns_selection_card_html(client) -> None:
@@ -185,3 +218,23 @@ def test_htmx_delete_returns_selection_count_update_for_stream_page(client) -> N
     conn.close()
 
     assert remaining == (0,)
+
+
+def test_htmx_delete_returns_candidate_to_stream_page(client) -> None:
+    test_client, db_path = client
+    candidate_id = _insert_candidate(db_path)
+    selection_id = _insert_selection_for_candidate(db_path, candidate_id=candidate_id)
+
+    response = test_client.delete(
+        f"/api/clips/selections/{selection_id}",
+        headers={
+            "HX-Request": "true",
+            "HX-Current-URL": "http://testserver/stream/video-123",
+        },
+    )
+
+    assert response.status_code == 200
+    assert 'id="candidate-count-label"' in response.text
+    assert "Returned" in response.text
+    assert 'hx-swap-oob="beforeend:#candidates-list"' in response.text
+    assert "Clip title" in response.text

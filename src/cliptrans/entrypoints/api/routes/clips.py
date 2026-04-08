@@ -36,6 +36,21 @@ class FindRequest(BaseModel):
     video_id: str
 
 
+def _visible_candidates(
+    candidates: list[ClipCandidate], selections: list[ClipSelection]
+) -> list[ClipCandidate]:
+    selected_candidate_ids = {s.candidate_id for s in selections if s.candidate_id is not None}
+    return [c for c in candidates if c.id not in selected_candidate_ids]
+
+
+async def _stream_state(
+    repo: ClipRepo, stream_id: str
+) -> tuple[list[ClipCandidate], list[ClipSelection]]:
+    candidates = await repo.get_candidates(stream_id)
+    selections = await repo.get_selections(stream_id=stream_id, status="pending")
+    return _visible_candidates(candidates, selections), selections
+
+
 def _is_htmx(request: Request) -> bool:
     return request.headers.get("HX-Request", "").lower() == "true"
 
@@ -77,8 +92,7 @@ def _selection_response(request: Request, selection: ClipSelection):
 
 
 async def _stream_counts(repo: ClipRepo, stream_id: str) -> tuple[int, int]:
-    candidates = await repo.get_candidates(stream_id)
-    selections = await repo.get_selections(stream_id=stream_id, status="pending")
+    candidates, selections = await _stream_state(repo, stream_id)
     return len(candidates), len(selections)
 
 
@@ -103,7 +117,8 @@ async def find_candidates(
 
 @router.get("/candidates/{stream_id}", response_model=list[ClipCandidate])
 async def get_candidates(stream_id: str, repo: ClipRepo):
-    return await repo.get_candidates(stream_id)
+    candidates, _selections = await _stream_state(repo, stream_id)
+    return candidates
 
 
 @router.get("/selections", response_model=list[ClipSelection])
@@ -122,7 +137,6 @@ async def approve_candidate(request: Request, repo: ClipRepo, manager: ClipManag
     if candidate is None:
         raise HTTPException(status_code=404, detail="Candidate not found")
     selection = await manager.approve_candidate(candidate, notes=body.notes)
-    await repo.delete_candidate(candidate.id)
     if _is_htmx(request):
         candidate_count, selection_count = await _stream_counts(repo, candidate.stream_id)
         return _template_response(
@@ -166,16 +180,27 @@ async def delete_selection(
     selection = await repo.get_selection(selection_id)
     if selection is None:
         raise HTTPException(status_code=404, detail="Selection not found")
+    restored_candidate = None
+    feedback_message = "Removed selection."
+    if selection.candidate_id is not None:
+        restored_candidate = await repo.get_candidate(selection.candidate_id)
+        if restored_candidate is not None:
+            feedback_message = f'Returned "{restored_candidate.title}" to Candidates.'
     await manager.delete_selection(selection_id)
     if not _is_htmx(request):
         return Response(status_code=204)
-    selection_count = len(
-        await manager.list_selections(stream_id=selection.stream_id, status="pending")
-    )
+    candidate_count, selection_count = await _stream_counts(repo, selection.stream_id)
     return _template_response(
         request=request,
         name="_delete_selection_result.html",
-        context={"selection_count": selection_count, "page_kind": _current_page_kind(request)},
+        context={
+            "candidate_count": candidate_count,
+            "selection_count": selection_count,
+            "page_kind": _current_page_kind(request),
+            "restored_candidate": restored_candidate,
+            "feedback_message": feedback_message,
+            "video_id": selection.stream_id,
+        },
     )
 
 

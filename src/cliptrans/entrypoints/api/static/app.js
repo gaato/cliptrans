@@ -33,7 +33,22 @@ function seekTo(seconds) {
   ytPlayer.playVideo();
 }
 
+function syncClipCounts() {
+  var candidateLabel = document.getElementById("candidate-count-label");
+  var selectionLabel = document.getElementById("selection-count-label");
+  var candidateCount = document.querySelectorAll("#candidates-list .clip-card").length;
+  var selectionCount = document.querySelectorAll("#selections-list .clip-card").length;
+
+  if (candidateLabel) candidateLabel.textContent = "Candidates (" + candidateCount + ")";
+  if (selectionLabel) selectionLabel.textContent = "Selections (" + selectionCount + ")";
+}
+
 /* Init */
 document.addEventListener("DOMContentLoaded", function () {
   loadYTApi();
+  syncClipCounts();
+});
+
+document.body.addEventListener("htmx:afterSettle", function () {
+  syncClipCounts();
 });

@@ -33,6 +33,11 @@ def _model_name(provider: str, model: str) -> str:
     return f"{prefix}:{model}"
 
 
+def _use_openai_responses_model(model: str) -> bool:
+    normalized = model.lower()
+    return normalized.startswith("gpt-5")
+
+
 class PydanticAITranslator:
     def __init__(
         self, provider: str = "openai", model: str = "gpt-4o", api_key: str | None = None
@@ -47,10 +52,15 @@ class PydanticAITranslator:
         provider = self._provider.lower()
         api_key = self._api_key
         if provider == "openai":
-            from pydantic_ai.models.openai import OpenAIChatModel
+            from pydantic_ai.models.openai import OpenAIChatModel, OpenAIResponsesModel
             from pydantic_ai.providers.openai import OpenAIProvider
 
-            return OpenAIChatModel(self._model, provider=OpenAIProvider(api_key=api_key))
+            model_cls = (
+                OpenAIResponsesModel
+                if _use_openai_responses_model(self._model)
+                else OpenAIChatModel
+            )
+            return model_cls(self._model, provider=OpenAIProvider(api_key=api_key))
         if provider == "anthropic":
             from pydantic_ai.models.anthropic import AnthropicModel
             from pydantic_ai.providers.anthropic import AnthropicProvider

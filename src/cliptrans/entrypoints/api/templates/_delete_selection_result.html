@@ -1,7 +1,15 @@
 {% if page_kind == "stream" %}
+<span id="candidate-count-label" hx-swap-oob="outerHTML">Candidates ({{ candidate_count }})</span>
 <span id="selection-count-label" hx-swap-oob="outerHTML">Selections ({{ selection_count }})</span>
 <div id="clip-feedback" hx-swap-oob="innerHTML">
-  <p class="action-feedback">Removed selection.</p>
+  <p class="action-feedback">{{ feedback_message }}</p>
+</div>
+{% endif %}
+{% if restored_candidate %}
+<div id="candidates-empty" hx-swap-oob="outerHTML"></div>
+{% set c = restored_candidate %}
+<div hx-swap-oob="beforeend:#candidates-list">
+  {% include "_candidate_card.html" %}
 </div>
 {% endif %}
 {% if selection_count == 0 %}
